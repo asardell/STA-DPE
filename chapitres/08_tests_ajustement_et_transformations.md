@@ -383,7 +383,12 @@ Ne pas rejeter $H_0$ n'est pas accepter $H_0$. Avec 20 observations, β est gran
 Quand une variable est positive et asymétrique, on peut chercher une puissance $\lambda$ qui la rend plus proche d'une loi normale. La transformation de Box-Cox s'écrit :
 
 $$
-y(\lambda) = \begin{cases} \dfrac{x^{\lambda} - 1}{\lambda} & \text{si } \lambda \neq 0 \\[2mm] \ln(x) & \text{si } \lambda = 0 \end{cases}
+y(\lambda) = \left\{
+\begin{array}{ll}
+\dfrac{x^{\lambda} - 1}{\lambda} & \text{si } \lambda \neq 0 \\
+\ln(x) & \text{si } \lambda = 0
+\end{array}
+\right.
 $$
 
 Le paramètre $\lambda$ est choisi pour maximiser la vraisemblance. Quand $\lambda = 0$, la transformation est le logarithme.
@@ -451,13 +456,14 @@ La transformation optimale n'est pas toujours la plus simple à interpréter. Le
 Les transformations de Johnson rendent une variable plus proche d'une loi normale, y compris quand elle contient des valeurs négatives, cas où Box-Cox ne s'applique pas. On utilise ici la transformation **Yeo-Johnson**, qui appartient à la même famille et est disponible dans `bestNormalize` :
 
 $$
-\psi(x, \lambda) =
-\begin{cases}
-\dfrac{(x+1)^{\lambda} - 1}{\lambda} & \text{si } x \ge 0,\ \lambda \neq 0 \\[2mm]
-\ln(x+1) & \text{si } x \ge 0,\ \lambda = 0 \\[2mm]
--\dfrac{(1-x)^{2-\lambda} - 1}{2-\lambda} & \text{si } x < 0,\ \lambda \neq 2 \\[2mm]
+\psi(x, \lambda) = \left\{
+\begin{array}{ll}
+\dfrac{(x+1)^{\lambda} - 1}{\lambda} & \text{si } x \ge 0,\ \lambda \neq 0 \\
+\ln(x+1) & \text{si } x \ge 0,\ \lambda = 0 \\
+-\dfrac{(1-x)^{2-\lambda} - 1}{2-\lambda} & \text{si } x < 0,\ \lambda \neq 2 \\
 -\ln(1-x) & \text{si } x < 0,\ \lambda = 2
-\end{cases}
+\end{array}
+\right.
 $$
 
 Pour une variable positive, seules les deux premières lignes s'appliquent. Le paramètre $\lambda$ est estimé par maximum de vraisemblance, comme pour Box-Cox.
