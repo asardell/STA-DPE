@@ -383,7 +383,7 @@ Ne pas rejeter $H_0$ n'est pas accepter $H_0$. Avec 20 observations, β est gran
 Quand une variable est positive et asymétrique, on peut chercher une puissance $\lambda$ qui la rend plus proche d'une loi normale. La transformation de Box-Cox s'écrit :
 
 $$
-y(\lambda) = \left\{
+y(\lambda) = \left\lbrace
 \begin{array}{ll}
 \dfrac{x^{\lambda} - 1}{\lambda} & \text{si } \lambda \neq 0 \\
 \ln(x) & \text{si } \lambda = 0
@@ -456,7 +456,7 @@ La transformation optimale n'est pas toujours la plus simple à interpréter. Le
 Les transformations de Johnson rendent une variable plus proche d'une loi normale, y compris quand elle contient des valeurs négatives, cas où Box-Cox ne s'applique pas. On utilise ici la transformation **Yeo-Johnson**, qui appartient à la même famille et est disponible dans `bestNormalize` :
 
 $$
-\psi(x, \lambda) = \left\{
+\psi(x, \lambda) = \left\lbrace
 \begin{array}{ll}
 \dfrac{(x+1)^{\lambda} - 1}{\lambda} & \text{si } x \ge 0,\ \lambda \neq 0 \\
 \ln(x+1) & \text{si } x \ge 0,\ \lambda = 0 \\
