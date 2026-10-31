@@ -204,7 +204,7 @@ $$
 
 Pour la loi normale centrée réduite $\mathcal{N}(0, 1)$, la densité est notée $\varphi$ et la fonction de répartition $\Phi$.
 
-[![alt text]()](https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Normal_Distribution_PDF.svg/langfr-330px-Normal_Distribution_PDF.svg.png?utm_source=fr.wikipedia.org&utm_campaign=parser&utm_content=thumbnail)
+![Loi normale](https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Normal_Distribution_PDF.svg/langfr-330px-Normal_Distribution_PDF.svg.png)
 
 ### Mémo
 
