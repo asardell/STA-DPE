@@ -73,9 +73,9 @@ Le Jour 3 regroupe huit chapitres : prévoir un rythme soutenu, ou reporter les 
 | 6 | `runif()`, `rnorm()`, `set.seed()`, `replicate()`, `dunif()`, `punif()`, `qunif()`, `dnorm()`, `pnorm()`, `qnorm()`, `quantile()`, `qqnorm()`, `qqline()`, `stat_function()`, `stat_qq()`, `geom_density()`, `facet_wrap()`, `after_stat()`, `add_trace()` (package `plotly`), `histnorm` |
 | 7 | `qnorm()`, `qt()`, `sqrt()`, `length()`, `mean()`, `sd()`, `sample()`, `replicate()`, `t.test()` (`$conf.int`, `conf.level`), `prop.test()`, `cat()`, `for`, `geom_point()`, `geom_errorbar()`, `ggplotly()` |
 | 8 | `t.test()` (`$p.value`, `mu`), `replicate()`, `shapiro.test()`, `head()`, `ad.test()` (package `nortest`), `lm()`, `MASS::boxcox()`, `which.max()`, `bestNormalize::yeojohnson()` (`$lambda`, `$x.t`), `bestNormalize::bestNormalize()` (`$chosen_transform`, `$x.t`), `wilcox.test()` (comparaison hors programme), `plot_ly()`, `add_trace()`, `qqnorm()` (`plot.it = FALSE`), `qqline()`, `log()`, `rexp()`, `ggplot()` (`geom_histogram()`) |
-| 9 | `t.test()` (un échantillon), `pwr.norm.test()`, `pwr.t.test()` (package `pwr`) |
-| 10 | `binom.test()`, `poisson.test()`, `prop.test()`, `pwr.p.test()` |
-| 11 | `var.test()`, `car::leveneTest()`, `t.test()` (`var.equal = TRUE`, `paired = TRUE`, Welch), `prop.test()` (deux échantillons), `pwr.2p.test()` |
+| 9 | `t.test()` (un échantillon, `$conf.int`, `$p.value`), `pnorm()`, `qnorm()`, `pwr.norm.test()`, `pwr.t.test()`, `replicate()`, `sapply()`, `ggplot()`, `geom_vline()`, `annotate()`, `ggplotly()`, `plot_ly()` (package `pwr` pour les puissances) |
+| 10 | `binom.test()`, `poisson.test()` (`T`, `r`, `alternative`), `prop.test()`, `pwr.p.test()`, `ES.h()`, `dbinom()`, `geom_col()`, `ggplotly()`, `plot_ly()` |
+| 11 | `var.test()`, `car::leveneTest()`, `t.test()` (`var.equal = TRUE`, `paired = TRUE`, Welch), `prop.test()` (deux échantillons, `$conf.int`), `pwr.2p.test()`, `pwr.2p2n.test()`, `ES.h()`, `geom_boxplot()`, `plot_ly(type = "box")` |
 | 12 | `cor.test()`, `lm()`, `coef()`, `predict()`, `summary()`, `resid()`, `fitted()`, `abline()` |
 | 13 | `chisq.test()`, `table()`, `xtabs()`, `$expected`, `$residuals` |
 | 14 | `aov()`, `summary()`, `TukeyHSD()`, `pairwise.t.test()` (correction Bonferroni), `car::leveneTest()`, `bartlett.test()` |

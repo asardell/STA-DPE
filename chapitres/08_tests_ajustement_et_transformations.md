@@ -10,6 +10,8 @@ Voici les objectifs de ce chapitre :
 - [ ] transformer une variable avec la transformation de Box-Cox ou une transformation de Johnson
 - [ ] évaluer la robustesse d'un test quand ses conditions ne sont pas remplies
 
+> **Contexte :** avant de comparer des groupes ou d'appliquer un test de moyenne, il faut vérifier que les données s'y prêtent. Dans un service de données, une part importante des erreurs d'interprétation vient d'un test appliqué sans cette vérification. Ce chapitre donne la démarche d'un test et les outils pour contrôler la normalité, qui conditionnent la plupart des chapitres suivants.
+
 ## Sommaire
 
 - [Chapitre 8 – Démarche d'un test, tests d'ajustement et transformations](#chapitre-8--démarche-dun-test-tests-dajustement-et-transformations)
@@ -107,6 +109,8 @@ Dans ce chapitre, les tests vérifient une **condition** : la normalité des don
 
 Le risque α est la fréquence de rejets quand $H_0$ est vraie. On le vérifie sur des données simulées, où $H_0$ est vraie par construction.
 
+> **Contexte :** un test est une décision prise avec un risque. Le risque α (fausse alerte) est fixé par l'équipe ; β (fausse sécurité) dépend de la taille de l'étude. Avant une décision à fort enjeu, comme le déclenchement de travaux, connaître ces deux risques évite de sur-interpréter un résultat.
+
 ### Mémo
 
 | Nom de la commande | Description | Argument pertinent | Exemple |
@@ -129,6 +133,7 @@ mean(p_h0 < 0.05)
 ### Exercices
 
 1. Exécuter la simulation ci-dessus. La fréquence de rejet est-elle proche de 0,05 ?
+   > **Intérêt :** montrer que la fréquence de fausses alertes vaut α rend concrète la notion de risque que le décideur doit accepter.
 <details>
 <summary>Correction</summary>
 
@@ -140,6 +145,7 @@ C'est la définition de α : la proportion de fausses alertes sur un grand nombr
 </details>
 
 2. Simuler maintenant $H_1$ vraie : les données suivent $\mathcal{N}(52, 10^2)$, et on teste $H_0 : \mu = 50$ avec $n = 20$. Calculer la proportion de tests qui **ne rejettent pas** $H_0$. Quel est le risque β correspondant ?
+   > **Intérêt :** β dépend de la taille de l'étude : un résultat négatif sur un petit échantillon ne doit pas être présenté comme une absence d'effet.
 <details>
 <summary>Correction</summary>
 
@@ -155,6 +161,7 @@ beta            # proportion de tests qui ne rejettent pas H0 à tort
 </details>
 
 3. Répéter la question 2 avec $n = 200$. Que deviennent β et la puissance ?
+   > **Intérêt :** augmenter n fait baisser β sans changer α : c'est l'argument pour dimensionner l'étude avant de la lancer.
 <details>
 <summary>Correction</summary>
 
@@ -180,6 +187,8 @@ Le test de Shapiro-Wilk vérifie si un échantillon suit une loi normale.
 
 Si $p < 0{,}05$, on rejette la normalité. Le test accepte entre 3 et **5 000** observations : au-delà, il faut prendre un sous-échantillon.
 
+> **Contexte :** les tests de normalité conditionnent le choix du test de moyennes. Dans un rapport, cette vérification se présente comme une étape documentée, qui justifie la méthode retenue.
+
 ### Mémo
 
 | Nom de la commande | Description | Argument pertinent | Exemple |
@@ -204,6 +213,7 @@ shapiro.test(log(surface_5000))
 ### Exercices
 
 1. Lancer `shapiro.test()` sur les 5 000 premières surfaces. Quelle est la décision au seuil de 5 % ?
+   > **Intérêt :** un rejet confirme ce que montrent les histogrammes : la surface n'est pas normale, donc les tests de moyenne doivent être justifiés.
 <details>
 <summary>Correction</summary>
 
@@ -215,6 +225,7 @@ shapiro.test(surface_5000)
 </details>
 
 2. Lancer le test sur le logarithme de la surface. La décision change-t-elle ?
+   > **Intérêt :** montrer que le logarithme ne suffit pas à passer le test aide à décider entre transformer la variable et accepter une approximation.
 <details>
 <summary>Correction</summary>
 
@@ -226,6 +237,7 @@ Avec 5 000 observations, le test détecte des écarts très faibles à la normal
 </details>
 
 3. Lancer `shapiro.test()` sur un échantillon de 6 000 observations. Que se passe-t-il ?
+   > **Intérêt :** la limite de 5 000 observations est une contrainte d'outil que l'équipe doit connaître, pour éviter une erreur de script en production.
 <details>
 <summary>Correction</summary>
 
@@ -237,6 +249,7 @@ La limite de 5 000 est imposée par la fonction. Il faut prendre un sous-échant
 </details>
 
 4. Rédiger la conclusion complète pour la surface, en citant H0, H1, α, la p-value et la conclusion.
+   > **Intérêt :** cette conclusion est le modèle à reprendre dans un rapport : hypothèses, seuil, statistique, décision.
 <details>
 <summary>Correction</summary>
 
@@ -244,6 +257,7 @@ La limite de 5 000 est imposée par la fonction. Il faut prendre un sous-échant
 </details>
 
 5. Simuler un échantillon normal de taille 50 : `set.seed(42)` puis `x <- rnorm(50, mean = 50, sd = 10)`. Appliquer `shapiro.test()` et noter la p-value. Que peut-on conclure de cette p-value, et que ne peut-on pas conclure ?
+   > **Intérêt :** une p-value élevée ne prouve pas la normalité : c'est le point à expliquer à un lecteur qui y voit une validation.
 <details>
 <summary>Correction</summary>
 
@@ -259,6 +273,8 @@ Conclusion : au seuil de 5 %, si $p > 0{,}05$, on **ne rejette pas** $H_0$. Les 
 ## Exercice 3 – Test d'Anderson-Darling
 
 Le test d'Anderson-Darling compare la fonction de répartition empirique à celle de la loi normale, en donnant plus de poids aux valeurs extrèmes. Il n'a pas de limite de taille d'échantillon.
+
+> **Contexte :** Anderson-Darling pèse davantage les extrémités de la distribution. Il est utile quand les valeurs très élevées comptent, comme les consommations exceptionnelles qui coûtent cher à traiter.
 
 Si $x_{(1)} \le \dots \le x_{(n)}$ sont les observations triées, et $F$ la fonction de répartition de la loi normale ajustée (moyenne et écart type estimés) :
 
@@ -286,6 +302,7 @@ nortest::ad.test(surface_ok)
 ### Exercices
 
 1. Lancer `nortest::ad.test()` sur `surface_ok`, avec les 9 899 surfaces. Quelle est la décision ?
+   > **Intérêt :** un test sans limite de taille est utile sur un fichier complet de 9 899 DPE, où Shapiro-Wilk ne s'applique pas directement.
 <details>
 <summary>Correction</summary>
 
@@ -296,6 +313,7 @@ nortest::ad.test(surface_ok)
 </details>
 
 2. Lancer le test sur le logarithme de la surface. La statistique diminue-t-elle ? La décision change-t-elle ?
+   > **Intérêt :** la transformation réduit la statistique mais ne rend pas la distribution normale : la décision reste un rejet, et il faut le dire.
 <details>
 <summary>Correction</summary>
 
@@ -307,13 +325,27 @@ La transformation réduit nettement l'écart à la normalité, sans le supprimer
 </details>
 
 3. Expliquer pourquoi la statistique $A^2$ augmente avec les valeurs extrêmes, en lisant la formule : que représente le terme $\ln(1 - F(x_{(n+1-i)}))$ pour la plus grande valeur ?
+   > **Intérêt :** comprendre pourquoi les valeurs extrêmes pèsent dans $A^2$ aide à expliquer un rejet dû à quelques dossiers atypiques.
 <details>
 <summary>Correction</summary>
 
 Pour la plus grande valeur ($i = 1$), $F(x_{(n)})$ est proche de 1 si la valeur est très haute, donc $1 - F(x_{(n)})$ est très petit et son logarithme très négatif. Le poids $(2i - 1)$ est faible pour $i = 1$, mais les queues restent pénalisées. Une valeur extrême, comme les 3 330 m², fait donc fortement augmenter $A^2$.
 </details>
 
-4. Reprendre l'échantillon simulé à la question 5 de l'exercice 2 (`x`, de taille 50, normal par construction). Lancer `nortest::ad.test(x)` et comparer la p-value à celle de `shapiro.test(x)`. Les deux tests prennent-ils la même décision ?
+4. Refaire le test d'Anderson-Darling sur les 30 premières surfaces seulement : `nortest::ad.test(surface_ok[1:30])`. Comparer la p-value à celle obtenue sur les 9 899 surfaces (question 1). Que constate-t-on ?
+   > **Intérêt :** c'est l'effet de la taille de l'échantillon, abordé à l'exercice 4 : la même variable, qui n'est pas normale sur l'ensemble du fichier, n'est pas rejetée sur 30 observations. Sur un petit échantillon, le test manque l'écart réel.
+<details>
+<summary>Correction</summary>
+
+```r
+nortest::ad.test(surface_ok[1:30])
+# A ≈ 0,54 ; p-value ≈ 0,155 : on ne rejette pas H0.
+```
+Sur 9 899 surfaces, la p-value est pratiquement nulle et H0 est rejetée (question 1). Sur les 30 premières, la p-value est de 0,155 : la même variable paraît normale. Ce n'est pas que la surface est devenue normale, mais que 30 observations ne suffisent pas à détecter son asymétrie.
+</details>
+
+5. Reprendre l'échantillon simulé à la question 5 de l'exercice 2 (`x`, de taille 50, normal par construction). Lancer `nortest::ad.test(x)` et comparer la p-value à celle de `shapiro.test(x)`. Les deux tests prennent-ils la même décision ?
+   > **Intérêt :** deux tests qui concordent renforcent la conclusion : un rapport gagne en crédibilité en croisant les méthodes.
 <details>
 <summary>Correction</summary>
 
@@ -334,6 +366,8 @@ Les deux p-values sont en général différentes, car les deux tests ne mesurent
 
 Le même écart à la normalité peut donner un rejet avec un grand échantillon et une non-détection avec un petit. C'est le risque β qui augmente quand $n$ diminue.
 
+> **Contexte :** un même écart à la normalité peut être détecté ou non selon la taille du fichier. Il faut donc interpréter un test de normalité en fonction de l'effectif, avant de conclure à une difficulté réelle.
+
 ### Exemple
 
 ```r
@@ -346,6 +380,7 @@ shapiro.test(asymetrique)$p.value
 ### Exercices
 
 1. Répéter le test de Shapiro-Wilk 1000 fois sur des échantillons de taille 30 issus de la loi exponentielle. Quelle proportion de tests rejette la normalité ?
+   > **Intérêt :** avec 30 observations, un test manque souvent un écart réel : un rapport doit le signaler.
 <details>
 <summary>Correction</summary>
 
@@ -359,6 +394,7 @@ La part exacte dépend de la simulation. Le point important : avec 30 observatio
 </details>
 
 2. Refaire la question 1 avec des échantillons de taille 1000. Que constate-t-on ?
+   > **Intérêt :** avec 1 000 observations, presque tout rejette : un rejet ne signifie pas que l'écart est gênant pour la suite de l'analyse.
 <details>
 <summary>Correction</summary>
 
@@ -372,6 +408,7 @@ Le test détecte presque toujours l'écart avec un grand échantillon. Le résul
 </details>
 
 3. Un collègue dit : « Shapiro-Wilk ne rejette pas la normalité sur mes 20 observations, donc mes données sont normales. » Que répondre ?
+   > **Intérêt :** un test non significatif sur peu de données ne doit pas être présenté comme une validation de la méthode.
 <details>
 <summary>Correction</summary>
 
@@ -395,6 +432,8 @@ Le paramètre $\lambda$ est choisi pour maximiser la vraisemblance. Quand $\lamb
 
 ![](https://feaz-book.com/numeric-boxcox_files/figure-html/fig-boxcox-normal-1.png)
 
+> **Contexte :** transformer une variable permet d'utiliser des méthodes adaptées à la loi normale. En revanche, la transformation change l'unité de lecture : un résultat sur une variable transformée doit être reconverti ou expliqué au lecteur.
+
 ### Mémo
 
 | Nom de la commande | Description | Argument pertinent | Exemple |
@@ -415,6 +454,7 @@ lambda_hat
 ### Exercices
 
 1. Calculer le $\lambda$ qui maximise la vraisemblance, puis le comparer à 0 (logarithme) et à 1 (pas de transformation).
+   > **Intérêt :** estimer λ montre comment la transformation s'adapte aux données, sans choix arbitraire de puissance.
 <details>
 <summary>Correction</summary>
 
@@ -425,6 +465,7 @@ $\lambda$ est plus proche de 0 que de 1 : une transformation proche du logarithm
 </details>
 
 2. Appliquer la transformation avec $\lambda$ estimé et tester la normalité du résultat avec `nortest::ad.test()`.
+   > **Intérêt :** le test après transformation vérifie que la transformation a bien fonctionné : c'est un contrôle à faire et à documenter.
 <details>
 <summary>Correction</summary>
 
@@ -437,6 +478,7 @@ Comme à l'exercice 3, la transformation améliore la forme sans la rendre parfa
 </details>
 
 3. Comparer la statistique $A^2$ obtenue avec $\lambda = 0$ (le logarithme) et avec $\lambda$ estimé. Lequel est le plus proche de la normalité ?
+   > **Intérêt :** comparer λ = 0 (logarithme) et λ estimé permet de choisir la transformation la plus simple à expliquer à un décideur.
 <details>
 <summary>Correction</summary>
 
@@ -470,6 +512,8 @@ Pour une variable positive, seules les deux premières lignes s'appliquent. Le p
 
 ![](https://feaz-book.com/numeric-yeojohnson_files/figure-html/fig-yeojohnson-normal-1.png)
 
+> **Contexte :** les transformations de Johnson ouvrent les données comportant des valeurs négatives, fréquentes dans les écarts ou les bilans (par exemple une variation de consommation entre deux années). Box-Cox ne s'y applique pas.
+
 ### Mémo
 
 | Nom de la commande | Description | Argument pertinent | Exemple |
@@ -496,6 +540,7 @@ bestNormalize::yeojohnson(c(-2, -1, 0, 1, 2))$x.t
 ### Exercices
 
 1. Estimer le $\lambda$ de Yeo-Johnson sur `surface_ok`. Pourquoi ne peut-on pas le comparer directement au $\lambda$ de Box-Cox obtenu à l'exercice 5 ?
+   > **Intérêt :** une valeur de λ n'a de sens que dans la paramétrisation choisie : ne pas comparer deux λ issus de méthodes différentes.
 <details>
 <summary>Correction</summary>
 
@@ -507,6 +552,7 @@ Yeo-Johnson transforme $x + 1$ au lieu de $x$ : la valeur de $\lambda$ n'a pas l
 </details>
 
 2. Tracer l'histogramme de `x_yj` avec `ggplot2`, puis le comparer à celui de la surface brute (chapitre 4).
+   > **Intérêt :** un histogramme plus symétrique après transformation montre l'effet de la méthode à un non-statisticien.
 <details>
 <summary>Correction</summary>
 
@@ -519,6 +565,7 @@ ggplot(data.frame(x = x_yj), aes(x = x)) +
 </details>
 
 3. Essayer de calculer la puissance $(-2)^{0{,}5}$ en R. Puis appliquer `bestNormalize::yeojohnson()` à `c(-2, -1, 0, 1, 2)`. Que constatez-vous, et pourquoi Box-Cox ne s'applique-t-il pas aux valeurs négatives ?
+   > **Intérêt :** savoir que Box-Cox exige des valeurs positives évite une erreur de calcul sur des données de bilan contenant des négatifs.
 <details>
 <summary>Correction</summary>
 
@@ -541,6 +588,8 @@ Box-Cox utilise $x^{\lambda}$ : pour une valeur négative et une puissance non e
 ## Exercice 7 – Choisir la transformation avec `bestNormalize`
 
 `bestNormalize` compare plusieurs transformations, dont Yeo-Johnson, et retient la meilleure selon un critère de normalité.
+
+> **Contexte :** quand plusieurs transformations sont possibles, un package peut comparer leurs scores de normalité. Le choix final reste une décision de l'analyste, à documenter dans la méthode.
 
 ### Mémo
 
@@ -582,6 +631,7 @@ x_transforme <- bn$x.t
 ### Exercices
 
 1. Lancer `bestNormalize()` sur `surface_ok`. Quelle transformation est retenue ?
+   > **Intérêt :** le nom de la transformation retenue doit être noté : une mise à jour du package peut changer le résultat.
 <details>
 <summary>Correction</summary>
 
@@ -594,6 +644,7 @@ Le résultat dépend du package et de sa version : on le note dans le compte ren
 </details>
 
 2. Tracer l'histogramme des valeurs transformées avec `ggplot2`, puis les comparer à celui de la surface brute.
+   > **Intérêt :** le graphique confirme le choix automatique : un score ne remplace pas la vérification visuelle.
 <details>
 <summary>Correction</summary>
 
@@ -609,6 +660,8 @@ ggplot(data.frame(x = x_transforme), aes(x = x)) +
 Un test est **robuste** quand son α reste proche de la valeur annoncée même si une condition n'est pas remplie, par exemple la normalité. La robustesse dépend de la taille de l'échantillon : c'est souvent le TCL (chapitre 6) qui la rend possible.
 
 On vérifie ici la robustesse du test t sur une loi exponentielle, très asymétrique, dont la moyenne vraie est 1.
+
+> **Contexte :** dans la pratique, les données ne sont jamais parfaitement normales. La robustesse indique si un test de moyenne reste fiable malgré cet écart, ce qui permet de l'utiliser en connaissance de cause plutôt que de l'abandonner.
 
 ### Exemple
 
@@ -627,6 +680,7 @@ taux_rejet(100)
 ### Exercices
 
 1. Calculer le taux de rejet pour $n = 5$ et $n = 100$. Lequel est le plus proche de 0,05 ?
+   > **Intérêt :** le taux de rejet réel dépend de la taille : c'est l'argument pour exiger un effectif minimum dans une étude.
 <details>
 <summary>Correction</summary>
 
@@ -639,6 +693,7 @@ Avec peu d'observations, le test t s'écarte de son α annoncé quand la loi est
 </details>
 
 2. Comparer le test t à un test non paramétrique, `wilcox.test()`, sur la même loi avec $n = 5$. Ce test porte sur la **médiane** : pour la loi exponentielle de paramètre 1, la médiane vraie est $\ln 2 \approx 0{,}693$. Quel taux de rejet obtient-il ?
+   > **Intérêt :** un test non paramétrique est une alternative à présenter quand la normalité est douteuse et que l'échantillon est petit.
 <details>
 <summary>Correction</summary>
 
@@ -652,6 +707,7 @@ Le test de Wilcoxon ne suppose pas la normalité : il peut être une alternative
 </details>
 
 3. Rédiger la conclusion : quand peut-on utiliser un test paramétrique sur une variable asymétrique, et quand faut-il une alternative ?
+   > **Intérêt :** la conclusion sur la robustesse est un message clé à transmettre : elle justifie ou interdit le test choisi.
 <details>
 <summary>Correction</summary>
 
@@ -664,6 +720,8 @@ Pour un grand échantillon (plusieurs dizaines d'observations, selon l'asymétri
 ## Exercice 9 – Visualiser les quantiles avec `plotly`
 
 Le QQ-plot du chapitre 6 se rend interactif avec `plotly` : on identifie les points qui s'écartent de la droite de normalité.
+
+> **Contexte :** le QQ-plot interactif permet de repérer les dossiers atypiques responsables d'un écart à la normalité, avant de décider de les garder ou de les analyser à part.
 
 ### Exemple
 
@@ -681,6 +739,7 @@ plot_ly(x = ~qq$x, y = ~qq$y, type = "scatter", mode = "markers",
 ### Exercices
 
 1. Tracer le QQ-plot interactif du logarithme de la surface. Quels points s'écartent de la droite ?
+   > **Intérêt :** identifier les points qui s'écartent oriente l'analyse : il faut vérifier ces dossiers avant de conclure.
 <details>
 <summary>Correction</summary>
 
@@ -691,6 +750,7 @@ plot_ly(x = ~qq$x, y = ~qq$y, type = "scatter", mode = "markers",
 </details>
 
 2. Refaire le graphique avec la surface brute. Expliquer ce qu'on voit.
+   > **Intérêt :** comparer la surface brute et son logarithme montre l'intérêt de la transformation à un décideur.
 <details>
 <summary>Correction</summary>
 
