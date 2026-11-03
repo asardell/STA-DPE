@@ -147,6 +147,34 @@ t.test(ln_conso_m2)$conf.int
 $5{,}23$ est dans l'intervalle, donc on ne rejette pas $H_0$ : $5{,}20$ n'y est pas, donc on rejette. Les deux lectures donnent la même décision.
 </details>
 
+4. Reproduire un extrait de la table de Student : une ligne par ddl, une colonne par probabilité bilatérale $p$, et la valeur critique de $t$ dans chaque cellule. Lire la décision pour $t = 0{,}99$ à $n - 1 = 9\,898$ ddl, puis pour $t = 8{,}2$. Comparer avec `t.test()`.
+   > **Intérêt :** la table se lit à l'envers par rapport à la p-value : on compare $|t|$ à la valeur critique de la colonne $\alpha$ choisie. Avec 9 898 ddl, cette lecture et `t.test()` donnent la même décision.
+<details>
+<summary>Correction</summary>
+
+```r
+dfs <- c(10, 30, 100, 1000, 9898)
+ps  <- c(0.50, 0.32, 0.30, 0.20, 0.10, 0.05, 0.02, 0.01, 0.001)
+
+table_t <- outer(dfs, ps, function(df, p) qt(1 - p / 2, df = df))
+dimnames(table_t) <- list(ddl = dfs, p = ps)
+round(table_t, digits = 4)
+#        p
+# ddl      0.5     0.2     0.1    0.05    0.02    0.01   0.001
+# 10    0.6998  1.3722  1.8125  2.2281  2.7638  3.1693  4.5869
+# 30    0.6828  1.3104  1.6973  2.0423  2.4573  2.7500  3.6460
+# 100   0.6770  1.2901  1.6602  1.9840  2.3642  2.6259  3.3905
+# 1000  0.6747  1.2824  1.6464  1.9623  2.3301  2.5808  3.3003
+# 9898  0.6745  1.2816  1.6450  1.9602  2.3267  2.5763  3.2915
+
+t.test(ln_conso_m2, mu = 5.23)$p.value   # 0.32
+```
+
+**Pour $t = 0{,}99$ :** à 9 898 ddl, $|t| = 0{,}99$ est compris entre les valeurs critiques 0,6745 (colonne 0,50) et 1,2816 (colonne 0,20). La p-value est donc comprise entre 0,20 et 0,50. Comme $0{,}99 < 1{,}96$ (colonne 0,05), on ne rejette pas $H_0$ au seuil de 5 %. Le calcul exact donne 0,322, cohérent avec `t.test()`.
+
+**Pour $t = 8{,}2$ :** la valeur dépasse la dernière colonne (3,2915 pour $p = 0{,}001$). La p-value est donc inférieure à 0,001 : on rejette $H_0$. Le calcul exact `2 * pt(-8.2, df = 9898)` donne une valeur de l'ordre de $10^{-16}$, affichée « p-value < 2,2e-16 » par R. La table dit seulement « moins de 0,001 » ; pour la valeur précise, il faut le calcul.
+</details>
+
 > **Note : la p-value ne mesure pas l'importance de l'écart**
 > Une p-value très petite dit que l'écart est peu probable sous $H_0$, pas qu'il est important. Pour l'importance pratique, on regarde l'écart lui-même, ici $5{,}234 - 5{,}20 = 0{,}034$ sur le logarithme, soit une consommation environ 3 % plus élevée.
 

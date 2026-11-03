@@ -91,7 +91,7 @@ La **covariance** mesure si deux variables varient dans le même sens : positive
 Pour deux variables $X$ et $Y$ observées sur $n$ DPE, la covariance s'écrit :
 
 $$
-\operatorname{cov}(X, Y) = \frac{1}{n - 1} \sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y})
+\mathrm{cov}(X, Y) = \frac{1}{n - 1} \sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y})
 $$
 
 R utilise le diviseur $n - 1$, comme pour la variance.
@@ -163,7 +163,7 @@ Le **coefficient de corrélation de Pearson** est la covariance rendue sans unit
 Le coefficient s'obtient en divisant la covariance par le produit des écarts-types :
 
 $$
-r_{X,Y} = \frac{\operatorname{cov}(X, Y)}{s_X \times s_Y}
+r_{X,Y} = \frac{\mathrm{cov}(X, Y)}{s_X \times s_Y}
 $$
 
 où $s_X$ et $s_Y$ sont les écarts-types de $X$ et $Y$. Les unités se compensent entre le numérateur et le dénominateur : $r$ n'a pas d'unité. Diviser la surface par 10 ne change donc pas $r$, alors que la covariance est multipliée par 0,1 (exercice 1, question 2).
