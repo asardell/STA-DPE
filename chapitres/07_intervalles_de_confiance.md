@@ -254,6 +254,7 @@ Il faut multiplier $n$ par $10^2 = 100$ : la marge varie en $1/\sqrt{n}$. Concr�
 ## Exercice 4 – Petit échantillon : loi de Student (test t)
 
 Quand $n$ est petit et que $\sigma$ est inconnu, la loi normale sous-estime l'incertitude. On utilise la **loi de Student** à $n - 1$ degrés de liberté.
+
 $$
 \bar{x} \pm t_{n-1;\,1-\alpha/2} \cdot \frac{s}{\sqrt{n}}
 $$

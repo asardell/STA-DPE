@@ -82,10 +82,19 @@ Ce chapitre s'appuie sur trois types de couples de variables :
 
 > **Note : une liaison n'est pas une cause**
 > Deux variables peuvent être liées sans que l'une cause l'autre. La surface et la consommation totale augmentent ensemble, mais la consommation par m² est un meilleur indicateur de la performance d'un logement. Ce chapitre décrit les liaisons ; il ne permet pas de conclure à une cause.
+> Pour s'en convaincre, la collection de [corrélations fallacieuses de Tyler Vigen](https://www.tylervigen.com/spurious-correlations) associe des séries sans aucun lien réel, qui évoluent pourtant ensemble sur une même période.
 
 ## Exercice 1 – Covariance entre deux variables quantitatives
 
 La **covariance** mesure si deux variables varient dans le même sens : positive si elles augmentent ensemble, négative si l'une augmente quand l'autre diminue. Sa valeur dépend des unités : elle n'est pas comparable d'une paire de variables à l'autre.
+
+Pour deux variables $X$ et $Y$ observées sur $n$ DPE, la covariance s'écrit :
+
+$$
+\operatorname{cov}(X, Y) = \frac{1}{n - 1} \sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y})
+$$
+
+R utilise le diviseur $n - 1$, comme pour la variance.
 
 ### Mémo
 
@@ -150,6 +159,14 @@ sum(is.na(dpe$deperditions_murs) | is.na(dpe$besoin_chauffage))
 ## Exercice 2 – Coefficient de corrélation linéaire
 
 Le **coefficient de corrélation de Pearson** est la covariance rendue sans unité : il vaut entre −1 et +1. Plus sa valeur est proche de ±1, plus la liaison linéaire est forte. Proche de 0, il n'y a pas de liaison linéaire (mais il peut quand même en exister une non linéaire).
+
+Le coefficient s'obtient en divisant la covariance par le produit des écarts-types :
+
+$$
+r_{X,Y} = \frac{\operatorname{cov}(X, Y)}{s_X \times s_Y}
+$$
+
+où $s_X$ et $s_Y$ sont les écarts-types de $X$ et $Y$. Les unités se compensent entre le numérateur et le dénominateur : $r$ n'a pas d'unité. Diviser la surface par 10 ne change donc pas $r$, alors que la covariance est multipliée par 0,1 (exercice 1, question 2).
 
 | Valeur absolue | Lecture indicative |
 |----------------|--------------------|
@@ -227,6 +244,20 @@ Si les deux valeurs sont proches, la liaison est à peu près monotone et peu in
 > **Note : Pearson et Spearman**
 > Pearson mesure une liaison **linéaire** et réagit fortement aux valeurs extrêmes. Spearman travaille sur les rangs : il mesure une liaison **monotone** (qui va dans un seul sens), et résiste mieux aux extrêmes. Le choix dépend de la forme du nuage, qu'on regarde toujours avant de calculer.
 
+> **Attention : une corrélation proche de 0 ne veut pas dire « aucun lien »**
+> Le coefficient de Pearson ne mesure que la liaison **linéaire**. Une relation forte mais courbe, en U ou en cloche par exemple, peut donner une corrélation proche de 0. Le calcul ne signale rien : seul le nuage de points le montre.
+
+```r
+x <- seq(-3, 3, length.out = 101)
+y <- x^2          # liaison parfaite, mais non linéaire
+cor(x, y)
+# [1] environ 0
+```
+
+![Exemples de nuages de points : une liaison non linéaire peut donner une corrélation nulle](https://miro.medium.com/v2/resize:fit:2000/format:webp/1*FsDn_bkTV5Gaobd_o45OZg.png)
+
+Avant de calculer un coefficient, on regarde donc toujours le nuage de points (exercice 5).
+
 ## Exercice 3 – Corrélation et valeurs extrêmes
 
 Une seule valeur extrême peut modifier fortement un coefficient de Pearson. On le vérifie en calculant la corrélation sur deux sous-ensembles.
@@ -277,6 +308,7 @@ Une **matrice de corrélation** rassemble les corrélations de toutes les paires
 | `cor()` sur un dataframe | Matrice de corrélation des colonnes numériques. | `x`, `use` | `cor(dpe[, c("x", "y")], use = "pairwise.complete.obs")` |
 | `as.data.frame(as.table())` | Transforme la matrice en table longue, pour `ggplot2`. | | `as.data.frame(as.table(mat))` |
 | `geom_tile()` | Carte de couleurs. | | `geom_tile(aes(fill = Freq))` |
+| `corrplot()` (package `corrplot`) | Représentation de la matrice de corrélation, avec les coefficients affichés. | `method`, `type`, `addCoef.col` | `corrplot(matrice, method = "color", type = "upper", addCoef.col = "black")` |
 
 ### Exemple
 
@@ -296,7 +328,15 @@ ggplot(matrice_df, aes(x = Var1, y = Var2, fill = Freq)) +
   scale_fill_gradient2(low = "blue", mid = "white", high = "red", limits = c(-1, 1)) +
   labs(x = NULL, y = NULL, fill = "Corrélation") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Même matrice avec le package corrplot (install.packages("corrplot"))
+library(corrplot)
+corrplot(matrice, method = "color", type = "upper", addCoef.col = "black",
+         tl.col = "black")
 ```
+
+> **Note : `corrplot`**
+> Le package `corrplot` dessine la matrice en un seul appel. `type = "upper"` n'affiche que la moitié supérieure, puisque la matrice est symétrique. `addCoef.col` écrit les coefficients dans les cases.
 
 > **Note : `pairwise.complete.obs`**
 > Avec `"complete.obs"`, une ligne est écartée dès qu'une variable de la matrice est manquante. Avec `"pairwise.complete.obs"`, chaque paire utilise toutes les lignes où ses deux variables sont renseignées. Le second est plus juste, car il perd moins de données.
@@ -508,6 +548,33 @@ round(100 * tab["G", "maison"] / sum(tab["G", ]), digits = 1)  # 14.0 %
 round(100 * tab["G", "maison"] / sum(tab[, "maison"]), digits = 1)  # 12.2 %
 ```
 Les deux pourcentages ne répondent pas à la même question : le premier se rapporte aux DPE en G, le second aux maisons. Il faut donc toujours lire l'intitulé du profil.
+</details>
+
+4. Calculer le profil ligne du type d'énergie de chauffage (`type_energie_n1`) selon l'étiquette, pour les quatre énergies les plus représentées : électricité, gaz naturel, réseau de chauffage urbain et fioul domestique. Quelle énergie a la plus forte part de DPE en F ou G ?
+<details>
+<summary>Correction</summary>
+
+```r
+dpe_energie <- dpe |>
+  filter(type_energie_n1 %in% c("Électricité", "Gaz naturel",
+                                "Réseau de Chauffage urbain", "Fioul domestique"))
+
+tab_energie <- xtabs(~ type_energie_n1 + etiquette_dpe, data = dpe_energie)
+round(100 * prop.table(tab_energie, margin = 1), digits = 1)
+# Profils ligne (%), chaque ligne somme à 100 :
+#                              A    B     C     D     E     F     G
+# Électricité                0.4  3.7  48.8  25.8  12.3   5.1   3.9
+# Gaz naturel                0.0  0.8  37.9  35.2  19.0   5.7   1.5
+# Réseau de Chauffage urbain 0.0  2.1  35.0  48.8  10.9   2.7   0.5
+# Fioul domestique           0.0  0.0   0.0   5.0  30.0  32.5  32.5
+
+# Part des DPE en F ou G, pour chaque énergie
+round(100 * (tab_energie[, "F"] + tab_energie[, "G"]) / rowSums(tab_energie), digits = 1)
+# Électricité 9.0 ; Gaz naturel 7.2 ; Réseau 3.2 ; Fioul domestique 65.0
+```
+Le fioul domestique est nettement le plus défavorable : 65 % de ses DPE sont en F ou G. Il ne repose toutefois que sur 80 DPE, donc le pourcentage est instable. Parmi les énergies les plus fréquentes, l'électricité (9,0 %) devance le gaz naturel (7,2 %) et le réseau (3,2 %).
+
+Cette liaison ne prouve pas que le fioul dégrade l'étiquette : le type de bâtiment ou l'époque de construction peuvent expliquer une partie de l'écart. Vérifier cela demande une analyse à plusieurs variables (chapitres 15 et 16).
 </details>
 
 > **Note : le sens du profil**
