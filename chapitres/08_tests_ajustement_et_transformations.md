@@ -451,6 +451,9 @@ lambda_hat
 # Environ 0,18 : proche de 0, donc du logarithme
 ```
 
+> **Note : pourquoi `lm(surface_ok ~ 1)` et non le vecteur ?**
+> `boxcox()` du package `MASS` est conçu pour un modèle ajusté (un objet `lm`), car il calcule la vraisemblance du modèle pour chaque valeur de $\lambda$ à partir de ses résidus. Un simple vecteur de données n'a pas de résidus. Le modèle `lm(surface_ok ~ 1)` ne contient que la moyenne : c'est le modèle « la variable est une constante plus du bruit », qui correspond exactement à l'hypothèse de normalité de la variable. On obtient ainsi le même $\lambda$ que pour une variable seule.
+
 ### Exercices
 
 1. Calculer le $\lambda$ qui maximise la vraisemblance, puis le comparer à 0 (logarithme) et à 1 (pas de transformation).

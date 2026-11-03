@@ -310,12 +310,33 @@ Le second terme est négligeable sauf si $\delta$ est très grand ou de signe op
 
 Ici, l'écart standardisé est $d = \delta / \sigma$.
 
+### Choisir δ et lire l'écart standardisé
+
+On choisit $\delta$ avant l'étude : c'est le plus petit écart qui compte en pratique. Ce n'est pas un résultat des données.
+
+Sur le logarithme, $\delta = 0{,}10$ correspond à une consommation environ 10 % plus élevée ($e^{0{,}10} = 1{,}105$). Avec $\sigma \approx 0{,}416$, l'écart standardisé vaut $d = 0{,}10 / 0{,}416 \approx 0{,}24$ : c'est l'écart à détecter, exprimé en fraction de l'écart-type.
+
+Le tableau suivant compare les deux variables pour un même écart relatif. Les tailles d'échantillon sont des approximations de la formule Z (puissance 80 %, $\alpha = 5\,\%$).
+
+| Écart relatif | Variable brute : $\delta$, $d$, $n$ | Logarithme : $\delta$, $d$, $n$ |
+|---|---|---|
+| 5 % | 10,2 kWh/m² ; $d = 0{,}11$ ; $n \approx 643$ | 0,05 ; $d = 0{,}12$ ; $n \approx 543$ |
+| 10 % | 20,5 kWh/m² ; $d = 0{,}22$ ; $n \approx 161$ | 0,10 ; $d = 0{,}24$ ; $n \approx 136$ |
+| 20 % | 41,0 kWh/m² ; $d = 0{,}44$ ; $n \approx 41$ | 0,20 ; $d = 0{,}48$ ; $n \approx 34$ |
+
+Deux lectures à retenir :
+- sur la variable brute, l'écart-type (92,6 kWh/m²) est presque la moitié de la moyenne (204,8) : pour un même écart relatif, $d$ est plus petit et il faut beaucoup plus de DPE ;
+- sur le logarithme, l'écart-type est stable (0,416) et $\delta$ se lit directement comme un pourcentage. C'est pourquoi le chapitre travaille sur cette variable.
+
+> **Attention : les repères de Cohen ne servent pas à choisir $\delta$**
+> Cohen propose $d = 0{,}2$ (petit), $0{,}5$ (moyen) et $0{,}8$ (grand). Ces repères viennent de la psychologie expérimentale. Un $d$ de 0,24 est « petit » au sens de Cohen, et pourtant un écart de 10 % de consommation peut justifier une action. On choisit $\delta$ avec le commanditaire : quel écart change la décision, en dessous de quel écart il n'a pas d'intérêt pratique, et combien de DPE peut-on financer. Dimensionner pour un écart d'un écart-type entier ($d = 1$) risque de faire manquer des écarts plus petits qui comptent.
+
 ### Exemple
 
 ```r
-d <- 0.05 / sigma                 # écart de 0,05 sur le logarithme, en unités d'écart type
+d <- 0.10 / sigma                 # écart de 0,10 sur le logarithme (environ 10 %), en unités d'écart type
 pwr.norm.test(d = d, n = 100, sig.level = 0.05)
-# power = 0,225 : β ≈ 0,78
+# power = 0,672 : β ≈ 0,33
 ```
 
 ### Exercices
@@ -334,7 +355,7 @@ Puissance $\approx 0{,}225$, donc $\beta \approx 0{,}775$ : avec 100 observation
 <summary>Correction</summary>
 
 ```r
-pwr.norm.test(d = d, n = 544, sig.level = 0.05)
+pwr.norm.test(d = 0.05 / sigma, n = 544, sig.level = 0.05)
 # power ≈ 0,80
 ```
 Avec 544 observations, la puissance atteint 0,80 : c'est la valeur conventionnelle.
@@ -405,6 +426,7 @@ Avec $\alpha = 0{,}05$ et $1 - \beta = 0{,}80$, on a $z_{1-\alpha/2} = 1{,}96$ e
 za <- qnorm(0.975)
 zb <- qnorm(0.80)
 
+ceiling(((za + zb) * sigma / 0.10)^2)   # 136
 ceiling(((za + zb) * sigma / 0.05)^2)   # 543
 ceiling(((za + zb) * sigma / 0.02)^2)   # 3 391
 ```

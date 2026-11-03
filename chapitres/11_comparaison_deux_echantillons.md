@@ -51,6 +51,10 @@ Voici les objectifs de ce chapitre :
     - [Exemple](#exemple-7)
     - [Exercices](#exercices-7)
   - [Exercice 9 – Quel test choisir ?](#exercice-9--quel-test-choisir-)
+  - [Exercice 10 – Électricité contre réseau de chauffage urbain](#exercice-10--électricité-contre-réseau-de-chauffage-urbain)
+    - [Mémo](#mémo-6)
+    - [Préparation](#préparation)
+    - [Exercices](#exercices-8)
   - [Liens utiles](#liens-utiles)
 
 ## Préparation : packages, données et notations
@@ -284,7 +288,7 @@ avec des degrés de liberté ajustés. C'est le test par défaut de `t.test()`.
 ### Exemple
 
 ```r
-t.test(ln_appart, ln_maison)
+t.test(ln_appart, ln_maison , var.equal = FALSE)
 # t ≈ -5,62 ; df ajustés ; p-value ≈ 3.9 × 10^-8
 # 95 percent confidence interval: -0,2143 -0,1035
 ```
@@ -565,6 +569,83 @@ Test de Levene (ou Fisher), puis Welch, car les variances diffèrent (exercice 2
 <summary>Correction</summary>
 
 Ce n'est pas un test à deux échantillons : il relève du chapitre 9 (test t à un échantillon).
+</details>
+
+## Exercice 10 – Électricité contre réseau de chauffage urbain
+
+On compare le logarithme de la consommation par m² entre deux énergies de chauffage : l'électricité et le réseau de chauffage urbain (libellé `Réseau de Chauffage urbain` dans les données). Les deux groupes ont des effectifs très différents, et des dispersions différentes : c'est un bon exemple pour choisir le test.
+
+> **Contexte :** un bureau d'études qui compare deux solutions de chauffage pour un parc doit savoir si l'écart de performance est réel, et quel test permet de le conclure sans supposer ce qui n'est pas vérifié. Le réseau de chauffage urbain est souvent présenté comme une solution performante : le test doit le confirmer ou l'infirmer sur les données.
+
+### Mémo
+
+| Nom de la commande | Description | Argument pertinent | Exemple |
+|------------------|-------------|--------------------|---------|
+| `var.test()` | Test F de Fisher d'égalité de deux variances. | `x`, `y` | `var.test(elec, reseau)` |
+| `car::leveneTest()` | Test de Levene, centré sur la médiane par défaut. | formule, `data` | `leveneTest(ln_conso_m2 ~ type_energie_n1, data = dpe_ener)` |
+| `t.test()` | Test t de Student (`var.equal = TRUE`) ou de Welch (par défaut). | `var.equal` | `t.test(elec, reseau, var.equal = FALSE)` |
+
+### Préparation
+
+```r
+dpe_ener <- dpe |>
+  filter(surface_habitable_logement > 0, conso_5_usages_ep > 0,
+         type_energie_n1 %in% c("Électricité", "Réseau de Chauffage urbain")) |>
+  mutate(ln_conso_m2 = log(conso_5_usages_ep / surface_habitable_logement))
+
+elec   <- dpe_ener$ln_conso_m2[dpe_ener$type_energie_n1 == "Électricité"]
+reseau <- dpe_ener$ln_conso_m2[dpe_ener$type_energie_n1 == "Réseau de Chauffage urbain"]
+```
+
+### Exercices
+
+1. Calculer l'effectif, la moyenne et l'écart-type de chaque groupe. Quelle énergie a la moyenne la plus élevée, et quel est l'écart sur le logarithme ?
+   > **Intérêt :** avant tout test, les statistiques par groupe donnent l'ordre de grandeur de l'écart et la dispersion de chaque groupe.
+<details>
+<summary>Correction</summary>
+
+| Énergie | Effectif | Moyenne | Écart-type |
+|---------|----------|---------|------------|
+| Électricité | 4 792 | 5,272 | 0,406 |
+| Réseau de chauffage urbain | 647 | 5,218 | 0,335 |
+
+L'électricité a la moyenne la plus élevée : l'écart est de 0,054 sur le logarithme, soit un rapport d'environ 1,055 entre les consommations par m² (environ 5 % de plus). Le réseau est le groupe le moins dispersé.
+</details>
+
+2. Tester l'égalité des variances avec le test F de Fisher et le test de Levene. Faut-il supposer des variances égales ?
+   > **Intérêt :** le test de Student suppose des variances égales : on le vérifie avant de l'utiliser, comme pour les autres comparaisons de ce chapitre.
+<details>
+<summary>Correction</summary>
+
+```r
+var.test(elec, reseau)
+# F = 1.4685, ddl = (4791 ; 646), p-value = 7.4e-10
+
+car::leveneTest(ln_conso_m2 ~ type_energie_n1, data = dpe_ener)
+# F = 24.0, p < 0,0001
+```
+Les deux tests rejettent l'égalité des variances. On n'utilise donc pas le test t de Student à variances égales, mais le test de Welch.
+</details>
+
+3. Comparer les moyennes avec le test de Student (variances égales) et le test de Welch. Quelle est la conclusion, et quel test retenez-vous ?
+   > **Intérêt :** le test de Welch ajuste les degrés de liberté aux dispersions différentes : il est le choix sûr quand l'égalité des variances est rejetée.
+<details>
+<summary>Correction</summary>
+
+```r
+t.test(elec, reseau, var.equal = TRUE)    # Student : t = 3.22, ddl = 5 437, p = 0,0013
+t.test(elec, reseau, var.equal = FALSE)   # Welch   : t = 3.72, ddl = 922,7, p = 0,0002
+#  IC à 95 % de la différence : [0,025 ; 0,082]
+```
+Les deux tests concluent à une différence significative. Nous retenons Welch : l'égalité des variances est rejetée (question 2), et les ddl de Student (5 437) ne correspondent pas à la réalité des dispersions. L'intervalle de confiance de la différence ne contient pas 0.
+</details>
+
+4. Rédiger en trois phrases la conclusion pour un lecteur non statisticien : l'écart, le test utilisé, et sa limite.
+   > **Intérêt :** une conclusion doit dire ce qui est établi, dans quel sens, et ce qui ne l'est pas.
+<details>
+<summary>Correction</summary>
+
+Exemple de rédaction : « La consommation par m² est plus élevée en électricité qu'avec le réseau de chauffage urbain, avec un écart moyen d'environ 5 % (test de Welch, p = 0,0002). Les dispersions diffèrent fortement, ce qui impose ce test et réduit la précision de l'écart (intervalle de 2,5 % à 8,5 %). L'analyse ne tient pas compte du type de bâtiment ni de l'âge des logements : l'écart peut en partie venir de ces facteurs. »
 </details>
 
 ## Liens utiles

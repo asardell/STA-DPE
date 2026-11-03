@@ -31,12 +31,11 @@ Voici les objectifs de ce chapitre :
 ## Préparation : packages, données et notations
 
 ```r
-install.packages(c("pwr", "corrplot"))
+install.packages("pwr")
 library(readr)
 library(dplyr)
 library(ggplot2)
 library(pwr)
-library(corrplot)
 
 dpe <- read_csv("data/dpe_villeurbanne_10000.csv")
 
@@ -133,6 +132,18 @@ pwr.r.test(r = 0.1, power = 0.80, sig.level = 0.05)
 Il faut environ 783 DPE pour détecter une corrélation de 0,1 avec une probabilité de 80 %. Le jeu de 9 899 observations permet donc de détecter des liaisons bien plus faibles.
 </details>
 
+4. Calculer la plus petite corrélation détectable avec 9 899 DPE, une puissance de 80 % et un $\alpha$ de 5 %. Que peut-on dire de la corrélation de $-0{,}009$ entre surface et besoin de chauffage ?
+   > **Intérêt :** une corrélation non significative n'est pas une corrélation nulle : la puissance fixe le plus petit écart que le test peut voir. Ici, ce seuil est très bas, donc la non-significativité a plus de poids.
+<details>
+<summary>Correction</summary>
+
+```r
+pwr.r.test(n = 9899, power = 0.80, sig.level = 0.05)
+# r ≈ 0.028
+```
+Avec 9 899 DPE, une corrélation dont la valeur absolue atteint environ 0,028 est détectée avec 80 % de chances. La corrélation de $-0{,}009$ entre surface et besoin de chauffage est nettement sous ce seuil : une liaison linéaire de cette taille, si elle existe, est négligeable. L'exercice 4 montre toutefois une liaison monotone (Spearman), ce qui n'est pas une contradiction : la liaison n'est pas linéaire.
+</details>
+
 ## Exercice 2 – Matrice de corrélation et matrice de p-values
 
 Une matrice de corrélation (chapitre 5) donne le coefficient de chaque paire. Une **matrice de p-values** donne, pour chaque paire, la p-value du test $H_0 : \rho = 0$. Les deux se lisent ensemble : une corrélation forte avec une p-value élevée signifie un petit échantillon ou des données incomplètes.
@@ -148,7 +159,7 @@ Une matrice de corrélation (chapitre 5) donne le coefficient de chaque paire. U
 |-------|----------|--------------------|
 | Matrice de corrélation | `cor(dpe[, variables], use = "pairwise.complete.obs")` | `use` |
 | Matrice de p-values | boucle sur les paires avec `cor.test()` | `method` |
-| Graphique | `corrplot(matrice, method = "color", type = "upper", addCoef.col = "black")` | voir chapitre 5 |
+| Graphique | `geom_tile()` avec `ggplot2` : une case par paire, colorée selon la valeur | `fill`, `geom_text()` |
 
 ### Exemple
 
@@ -204,29 +215,51 @@ Seules les deux paires entre la surface et les variables thermiques (déperditio
 Les paires concernées sont : consommation / déperditions murs (0,291), consommation / besoin de chauffage (0,214), déperditions murs / coût total (0,273) et besoin de chauffage / coût total (0,208). Elles sont significatives avec près de 10 000 observations, mais leur force est faible : une part réelle mais limitée de la variabilité d'une variable est expliquée par l'autre.
 </details>
 
-3. Construire le graphique `corrplot` de la matrice de corrélation, avec les coefficients affichés. Pourquoi la diagonale est-elle toujours égale à 1 ?
-   > **Intérêt :** le graphique résume la matrice en une image, mais il ne montre pas les p-values : elles restent dans le tableau.
+3. Construire avec `ggplot2` deux graphiques : celui de la matrice de corrélation, puis celui de la matrice de p-values, avec la p-value de chaque paire affichée sur sa case. Pourquoi la diagonale est-elle toujours égale à 1 dans la matrice de corrélation, et pourquoi la matrice de p-values ne prend-elle pas les mêmes couleurs ?
+   > **Intérêt :** le graphique des coefficients dit l'intensité, celui des p-values dit la fiabilité. Les deux se lisent ensemble : une case colorée n'a de sens qu'avec sa p-value, et il ne faut pas commenter une liaison dont la p-value dit qu'elle n'est pas établie.
 <details>
 <summary>Correction</summary>
 
 ```r
-corrplot(matrice_r, method = "color", type = "upper", addCoef.col = "black",
-         tl.col = "black")
+# Matrice de corrélation : une case par paire, couleur et coefficient
+tab_r <- as.data.frame(as.table(matrice_r))
+
+ggplot(tab_r, aes(x = Var1, y = Var2, fill = Freq)) +
+  geom_tile() +
+  geom_text(aes(label = round(Freq, 2)), size = 3) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", limits = c(-1, 1)) +
+  labs(x = NULL, y = NULL, fill = "r") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Matrice de p-values : la diagonale n'est pas testée (NA) et on la retire
+tab_p <- as.data.frame(as.table(matrice_p)) |>
+  filter(!is.na(Freq)) |>
+  mutate(etiquette = format.pval(Freq, digits = 2))
+
+ggplot(tab_p, aes(x = Var1, y = Var2, fill = Freq)) +
+  geom_tile() +
+  geom_text(aes(label = etiquette), size = 3) +
+  scale_fill_gradient(low = "red", high = "white", limits = c(0, 1)) +
+  labs(x = NULL, y = NULL, fill = "p-value") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-La diagonale vaut 1 parce qu'une variable est toujours parfaitement corrélée avec elle-même. Le graphique ne montre pas les p-values : le tableau de l'exercice 1 reste nécessaire pour la significativité.
+
+La diagonale de la matrice de corrélation vaut 1 parce qu'une variable est toujours parfaitement corrélée avec elle-même. La matrice de p-values utilise une échelle de 0 à 1, sans valeur négative : une p-value basse (rouge) signale une liaison établie, et une p-value haute (blanc) une paire non significative. Toutes les cases reçoivent leur p-value. Les cases blanches sont celles de la surface avec les déperditions et le besoin de chauffage, dont les p-values (0,13 et 0,36) sont proches de 1. Les p-values très petites s'affichent `< 2.2e-16`.
 </details>
 
 ## Exercice 3 – Reproduire une table de Student
 
-Avant les logiciels, la p-value d'un test se lisait dans une **table de Student** : une ligne par nombre de degrés de liberté (ddl), une colonne par valeur de la statistique $t$, et la p-value à l'intersection. On la reproduit ici pour voir comment la p-value dépend de deux choses : la statistique $t$ et le ddl.
+Avant les logiciels, on décidait avec une **table de Student** : une ligne par nombre de degrés de liberté (ddl), une colonne par probabilité bilatérale $p$, et dans chaque cellule la **valeur critique** de la statistique $t$. On la reproduit ici pour voir comment cette valeur dépend du ddl et de la probabilité choisie.
 
-La p-value bilatérale d'une statistique $t$ à $d$ ddl est :
+La valeur critique $t^*$ à $d$ ddl et pour une probabilité $p$ vérifie :
 
 $$
-p = 2 \times P(T_d > |t|)
+P(|T_d| > t^*) = p
 $$
 
-Plus $|t|$ est grand, plus la p-value baisse. Pour un même $t$, un petit ddl donne une p-value plus élevée : la loi de Student a des queues plus épaisses que la loi normale.
+La lecture se fait ensuite dans l'autre sens : on compare la statistique observée $|t|$ à la valeur critique de la colonne choisie. Si $|t|$ dépasse $t^*$ pour la colonne $p$, la p-value est inférieure à $p$.
+
+Les valeurs critiques baissent quand le ddl augmente : la loi de Student a des queues plus épaisses que la loi normale quand le ddl est petit, et se confond avec elle pour un grand échantillon.
 
 > **Contexte :** dans un rapport, la table permet de vérifier d'un coup d'œil si un résultat est significatif, sans logiciel. C'est aussi un moyen de comprendre pourquoi un test sur un petit échantillon est moins sensible.
 
@@ -234,79 +267,79 @@ Plus $|t|$ est grand, plus la p-value baisse. Pour un même $t$, un petit ddl do
 
 | Nom de la commande | Description | Argument pertinent | Exemple |
 |------------------|-------------|--------------------|---------|
-| `pt()` | Probabilité sous la loi de Student : $P(T \le t)$. | `q`, `df` | `pt(-2, df = 30)` |
-| `qt()` | Valeur critique de la loi de Student. | `p`, `df` | `qt(0.975, df = 30)` |
-| `outer()` | Calcule une fonction pour toutes les combinaisons de deux vecteurs : un tableau complet. | `X`, `Y`, `FUN` | `outer(dfs, ts, function(df, t) ...)` |
+| `qt()` | Valeur critique de la loi de Student, pour la probabilité $1 - p/2$ (test bilatéral). | `p`, `df` | `qt(1 - 0.05 / 2, df = 30)` |
+| `pt()` | Probabilité sous la loi de Student : sert à vérifier une valeur. | `q`, `df` | `pt(-2, df = 30)` |
+| `outer()` | Calcule une fonction pour toutes les combinaisons de deux vecteurs : un tableau complet. | `X`, `Y`, `FUN` | `outer(dfs, ps, function(df, p) ...)` |
 
 ### Exemple
 
 ```r
 dfs <- c(5, 10, 30, 100, 1000, 9884)
-ts  <- c(0.5, 0.9, 1.0, 1.5, 2.0, 2.5, 3.0)
+ps  <- c(0.50, 0.20, 0.10, 0.05, 0.02, 0.01, 0.001)
 
-table_p <- outer(dfs, ts, function(df, t) 2 * pt(-t, df = df))
-dimnames(table_p) <- list(ddl = dfs, t = ts)
-round(table_p, digits = 4)
-#        t
-# ddl      0.5    0.9    1.0    1.5    2.0    2.5    3.0
-# 5      0.6383 0.4094 0.3632 0.1939 0.1019 0.0545 0.0301
-# 10     0.6279 0.3893 0.3409 0.1645 0.0734 0.0314 0.0133
-# 30     0.6207 0.3753 0.3253 0.1441 0.0546 0.0181 0.0054
-# 100    0.6182 0.3703 0.3197 0.1368 0.0482 0.0140 0.0034
-# 1000   0.6172 0.3683 0.3176 0.1339 0.0458 0.0126 0.0028
-# 9884   0.6171 0.3681 0.3173 0.1336 0.0455 0.0124 0.0027
+table_t <- outer(dfs, ps, function(df, p) qt(1 - p / 2, df = df))
+dimnames(table_t) <- list(ddl = dfs, p = ps)
+round(table_t, digits = 4)
+#        p
+# ddl      0.5     0.2     0.1    0.05    0.02    0.01   0.001
+# 5     0.7267  1.4759  2.0150  2.5706  3.3649  4.0321  6.8688
+# 10    0.6998  1.3722  1.8125  2.2281  2.7638  3.1693  4.5869
+# 30    0.6828  1.3104  1.6973  2.0423  2.4573  2.7500  3.6460
+# 100   0.6770  1.2901  1.6602  1.9840  2.3642  2.6259  3.3905
+# 1000  0.6747  1.2824  1.6464  1.9623  2.3301  2.5808  3.3003
+# 9884  0.6745  1.2816  1.6450  1.9602  2.3267  2.5763  3.2915
 ```
 
-La dernière ligne (9 884 ddl) est presque identique à la loi normale, comme dans le chapitre 7.
+La dernière ligne (9 884 ddl) est presque identique à la loi normale : la valeur critique à 5 % vaut 1,96, comme au chapitre 7.
 
 ### Exercices
 
-1. Lire dans la table la p-value d'une statistique $t = 2$ pour 5 ddl, puis pour 9 884 ddl. Pourquoi la p-value baisse-t-elle quand le ddl augmente ?
-   > **Intérêt :** une même statistique ne donne pas la même conclusion selon la taille de l'échantillon : c'est la raison pour laquelle il faut toujours donner le ddl avec le résultat.
+1. Lire dans la table la valeur critique à 5 % (colonne 0,05) pour 5 ddl, puis pour 9 884 ddl. Pourquoi cette valeur baisse-t-elle quand le ddl augmente ?
+   > **Intérêt :** le seuil de décision dépend du ddl : une même statistique ne donne pas la même conclusion selon la taille de l'échantillon. C'est pourquoi il faut toujours donner le ddl avec le résultat.
 <details>
 <summary>Correction</summary>
 
 ```r
-round(2 * pt(-2, df = 5), digits = 4)      # 0.1019
-round(2 * pt(-2, df = 9884), digits = 4)   # 0.0455
+table_t["5", "0.05"]       # 2.5706
+table_t["9884", "0.05"]    # 1.9602
 ```
-Avec 5 ddl, $t = 2$ n'est pas significatif au seuil de 5 % ; avec 9 884 ddl, il l'est. Plus le ddl est grand, plus la loi de Student ressemble à la loi normale, dont les queues sont plus fines : une même valeur de $t$ est donc moins probable par hasard.
+Avec 5 ddl, le seuil est 2,571 ; avec 9 884 ddl, il est 1,960. Plus le ddl est grand, plus la loi de Student ressemble à la loi normale, dont les queues sont plus fines : il faut donc une valeur de $t$ plus faible pour conclure.
 </details>
 
-2. Pour chaque ddl, trouver la valeur de $t$ à partir de laquelle la p-value passe sous 0,05. Comparer avec la valeur 1,96 de la loi normale.
-   > **Intérêt :** le seuil de décision dépend du ddl : un petit échantillon demande une statistique plus forte pour conclure, ce que la table montre directement.
+2. Pour $t = 2$, décider au seuil de 5 % à 5 ddl, puis à 9 884 ddl. Comparer avec les p-values exactes.
+   > **Intérêt :** une statistique se compare à la colonne du seuil choisi ; la p-value exacte confirme la décision, sans la remplacer.
 <details>
 <summary>Correction</summary>
 
-```r
-qt(0.975, df = c(5, 10, 30, 100, 1000, 9884))
-# 2.571 2.228 2.042 1.984 1.962 1.960
-```
-Ces valeurs critiques sont celles de la table de Student utilisées au chapitre 7. Elles tendent vers 1,96 quand le ddl augmente.
+- 5 ddl : $|t| = 2 < 2{,}5706$ : on ne rejette pas $H_0$. Exact : `2 * pt(-2, df = 5)` = 0,102.
+- 9 884 ddl : $|t| = 2 > 1{,}9602$ : on rejette $H_0$. Exact : `2 * pt(-2, df = 9884)` = 0,046.
+
+La même statistique est non significative avec 5 ddl et significative avec 9 884 ddl.
 </details>
 
-3. La p-value de la paire surface / besoin de chauffage (chapitre 12, exercice 1) est lue dans la table avec $t = -0{,}917$ et 9 884 ddl. Lire la valeur dans la table, puis la comparer à la valeur exacte.
-   > **Intérêt :** une lecture de table est toujours approximative : il faut savoir quand l'interpolation suffit et quand le calcul exact est nécessaire.
+3. La paire surface / besoin de chauffage a $t = -0{,}917$ avec 9 884 ddl. Lire dans la table entre quelles colonnes se situe la p-value, puis comparer avec la valeur exacte.
+   > **Intérêt :** la table donne un encadrement de la p-value, pas sa valeur : c'est suffisant pour décider, mais pas pour donner un chiffre précis.
 <details>
 <summary>Correction</summary>
 
-Dans la table, $|t| = 0{,}917$ se situe entre les colonnes 0,9 (p = 0,368) et 1,0 (p = 0,317). Une interpolation linéaire donne environ 0,36.
+Pour 9 884 ddl, $|t| = 0{,}917$ est compris entre 0,6745 (colonne 0,50) et 1,2816 (colonne 0,20) : la p-value est donc comprise entre 0,20 et 0,50. Comme $0{,}917 < 1{,}9602$ (colonne 0,05), on ne rejette pas $H_0$.
 
 ```r
 2 * pt(-0.9168, df = 9884)   # 0.359
 ```
-La valeur exacte est 0,359 : on ne rejette pas $H_0$. L'interpolation est très proche ici parce que les colonnes sont proches. Elle resterait approximative sur un intervalle plus large, car la courbe n'est pas une droite entre deux colonnes : pour une décision, le calcul exact est préférable.
+La valeur exacte 0,359 est bien dans l'encadrement. Pour donner un chiffre, il faut le calcul exact.
 </details>
 
-4. Lire la p-value de la paire surface / déperditions murs ($t = -1{,}499$, 9 884 ddl). La décision est-elle la même que pour surface / besoin ?
+4. La paire surface / déperditions murs a $t = -1{,}499$ avec 9 884 ddl. Encadrer sa p-value dans la table, et dire si la décision est la même que pour surface / besoin.
    > **Intérêt :** deux paires non significatives peuvent avoir des p-values très différentes : la décision ne dit pas tout de la force de la preuve.
 <details>
 <summary>Correction</summary>
 
+$|t| = 1{,}499$ est compris entre 1,2816 (colonne 0,20) et 1,6450 (colonne 0,10) : la p-value est comprise entre 0,10 et 0,20. La décision est la même que pour surface / besoin (non significative au seuil de 5 %), mais la p-value est plus proche du seuil.
+
 ```r
 2 * pt(-1.4988, df = 9884)   # 0.134
 ```
-La colonne 1,5 de la table donne 0,134 pour 9 884 ddl. La décision est la même que pour surface / besoin (non significative), mais la p-value est plus proche du seuil.
 </details>
 
 ## Exercice 4 – Spearman et Kendall
@@ -560,4 +593,3 @@ Aucun logement de 1 000 m² n'est dans les données, sauf quelques très grands 
 - [Documentation de `cor.test()` (R)](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/cor.test.html)
 - [Documentation de `lm()` (R)](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/lm.html)
 - [Documentation du package `pwr`](https://cran.r-project.org/package=pwr)
-- [Documentation du package `corrplot`](https://cran.r-project.org/package=corrplot)
