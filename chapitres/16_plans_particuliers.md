@@ -92,16 +92,39 @@ Les moyennes des régions sont 13,7 (A) et 17,7 (B) ; la moyenne générale vaut
 
 La variabilité se découpe ainsi :
 
-- **entre régions** : $\text{SCE}_{\text{région}} = 9 \times [(13{,}7 - 15{,}7)^2 + (17{,}7 - 15{,}7)^2] = 72{,}0$, avec 1 ddl ;
-- **entre champs, à l'intérieur d'une région** : $\text{SCE}_{\text{champ}} = 3 \times \sum (\bar{y}_{\text{champ}} - \bar{y}_{\text{région}})^2 = 64{,}0$, avec $2 \times (3 - 1) = 4$ ddl ;
-- **résiduelle** (plantes dans un même champ) : $\text{SCE}_E = 12{,}0$, avec $6 \times 2 = 12$ ddl.
+**Entre régions** (1 ddl) :
+
+$$
+\text{SCE}_{\text{région}} = 9 \times [(13{,}7 - 15{,}7)^2 + (17{,}7 - 15{,}7)^2] = 72{,}0
+$$
+
+**Entre champs, à l'intérieur d'une région** (4 ddl, soit $2 \times (3 - 1)$) :
+
+$$
+\text{SCE}_{\text{champ}} = 3 \times \sum (\bar{y}_{\text{champ}} - \bar{y}_{\text{région}})^2 = 64{,}0
+$$
+
+**Résiduelle**, c'est-à-dire les plantes dans un même champ (12 ddl, soit $6 \times 2$) :
+
+$$
+\text{SCE}_E = 12{,}0
+$$
 
 Le total vaut $72 + 64 + 12 = 148$, pour 17 ddl. Les carrés moyens sont : région 72,0 ; champ 16,0 ; résiduelle 1,0.
 
-Chaque facteur se teste contre celui qui le contient :
+Chaque facteur se teste contre celui qui le contient.
 
-- région : $F = \text{CM}_{\text{région}} / \text{CM}_{\text{champ}} = 72 / 16 = 4{,}5$, avec $(1 ; 4)$ ddl, p = 0,10 : pas significatif ;
-- champ : $F = \text{CM}_{\text{champ}} / \text{CM}_E = 16 / 1 = 16$, avec $(4 ; 12)$ ddl, p = 9,4e-5 : significatif.
+**Région** (ddl $(1 ; 4)$, p = 0,10 : pas significatif) :
+
+$$
+F = \frac{\text{CM}_{\text{région}}}{\text{CM}_{\text{champ}}} = \frac{72}{16} = 4{,}5
+$$
+
+**Champ** (ddl $(4 ; 12)$, p = 9,4e-5 : significatif) :
+
+$$
+F = \frac{\text{CM}_{\text{champ}}}{\text{CM}_E} = \frac{16}{1} = 16
+$$
 
 **Ce que l'exemple montre :** les plantes poussent très différemment d'un champ à l'autre, mais la différence entre régions n'est pas établie avec seulement deux régions. Le piège est de tester la région contre la résiduelle : on obtiendrait $F = 72$, une p-value minuscule, et une conclusion fausse, puisque les champs ne sont pas les mêmes d'une région à l'autre.
 
@@ -187,11 +210,31 @@ Les hypothèses sont :
 
 Avec $a$ bureaux, $b$ chargés par bureau et $n$ DPE par chargé, le tableau s'écrit :
 
-| Source | SCE | ddl | CM | $F$ | p-value |
-|--------|-----|-----|----|-----|---------|
-| Bureau (A) | $\text{SCE}_A = bn \sum_i (\bar{y}_{i\cdot\cdot} - \bar{y})^2$ | $a - 1$ | $\text{SCE}_A / (a-1)$ | $\text{CM}_A / \text{CM}_{B(A)}$ | $P(F_{a-1,\,a(b-1)} > F)$ |
-| Chargé dans le bureau B(A) | $\text{SCE}_{B(A)} = n \sum_{i,j} (\bar{y}_{ij\cdot} - \bar{y}_{i\cdot\cdot})^2$ | $a(b-1)$ | $\text{SCE}_{B(A)} / [a(b-1)]$ | $\text{CM}_{B(A)} / \text{CM}_E$ | $P(F_{a(b-1),\,ab(n-1)} > F)$ |
-| Résiduelle | $\text{SCE}_E = \sum_{i,j,k} (y_{ijk} - \bar{y}_{ij\cdot})^2$ | $ab(n-1)$ | $\text{SCE}_E / [ab(n-1)]$ | | |
+| Source | SCE | ddl | CM | F | p-value |
+|--------|-----|-----|----|---|---------|
+| Bureau (A) | formule (1) ci-dessous | a − 1 | SCE A / (a − 1) | CM A / CM B(A) | loi de Fisher, ddl (a − 1 ; a(b − 1)) |
+| Chargé dans le bureau B(A) | formule (2) ci-dessous | a(b − 1) | SCE B(A) / [a(b − 1)] | CM B(A) / CM E | loi de Fisher, ddl (a(b − 1) ; ab(n − 1)) |
+| Résiduelle | formule (3) ci-dessous | ab(n − 1) | SCE E / [ab(n − 1)] | | |
+
+Formules des sommes des carrés :
+
+Bureau (1) :
+
+$$
+\text{SCE}_A = bn \sum_i (\bar{y}_{i\cdot\cdot} - \bar{y})^2
+$$
+
+Chargé dans le bureau B(A) (2) :
+
+$$
+\text{SCE}_{B(A)} = n \sum_{i,j} (\bar{y}_{ij\cdot} - \bar{y}_{i\cdot\cdot})^2
+$$
+
+Résiduelle (3) :
+
+$$
+\text{SCE}_E = \sum_{i,j,k} (y_{ijk} - \bar{y}_{ij\cdot})^2
+$$
 
 Ici $a = 2$, $b = 2$, $n = 3$ : les ddl sont $(1)$, $(2)$ et $(8)$.
 
@@ -228,7 +271,15 @@ La table de `summary()` teste le bureau contre la résiduelle : c'est faux, car 
 <details>
 <summary>Correction</summary>
 
-$\text{SCE}_A = 2\,465{,}3$ (1 ddl), $\text{SCE}_{B(A)} = 1\,590{,}7$ (2 ddl), $\text{SCE}_E = 162{,}7$ (8 ddl). Somme : $2\,465{,}3 + 1\,590{,}7 + 162{,}7 = 4\,218{,}7$, pour 11 ddl. La décomposition est juste.
+Bureau : SCE = 2 465,3 (1 ddl). Chargé dans le bureau : SCE = 1 590,7 (2 ddl). Résiduelle : SCE = 162,7 (8 ddl).
+
+Somme :
+
+$$
+2\,465{,}3 + 1\,590{,}7 + 162{,}7 = 4\,218{,}7
+$$
+
+pour 11 ddl. La décomposition est juste.
 </details>
 
 2. Tester le bureau : calculer le $F$ correct (contre le chargé dans le bureau), puis lire la p-value dans la table de Fisher pour $F$ et les ddl $(1 ; 2)$. Comparer avec la valeur donnée par `summary()`.
@@ -236,12 +287,16 @@ $\text{SCE}_A = 2\,465{,}3$ (1 ddl), $\text{SCE}_{B(A)} = 1\,590{,}7$ (2 ddl), $
 <details>
 <summary>Correction</summary>
 
-$F_A = \dfrac{\text{CM}_A}{\text{CM}_{B(A)}} = \dfrac{2\,465{,}3}{795{,}3} = 3{,}10$, avec $(1 ; 2)$ ddl. La p-value vaut `pf(3.10, 1, 2, lower.tail = FALSE)` = 0,22 : on ne rejette pas $H_0$. Avec 2 ddl seulement, la puissance est très faible, et une différence de 30 kWh/m² entre bureaux n'est pas établie.
+$$
+F_A = \dfrac{\text{CM}_A}{\text{CM}_{B(A)}} = \dfrac{2\,465{,}3}{795{,}3} = 3{,}10
+$$
+
+avec $(1 ; 2)$ ddl. La p-value vaut `pf(3.10, 1, 2, lower.tail = FALSE)` = 0,22 : on ne rejette pas $H_0$. Avec 2 ddl seulement, la puissance est très faible, et une différence de 30 kWh/m² entre bureaux n'est pas établie.
 
 Le test contre la résiduelle donnerait $F = 2\,465{,}3 / 20{,}3 = 121{,}2$, p très petite : c'est la conclusion fausse fournie par `summary()`.
 </details>
 
-3. Tester le chargé dans le bureau : $F_{B(A)} = \text{CM}_{B(A)} / \text{CM}_E$, ddl $(2 ; 8)$. Quelle est la conclusion ?
+3. Tester le chargé dans le bureau : calculer le $F$ (carré moyen du chargé contre résiduelle), avec ddl $(2 ; 8)$. Quelle est la conclusion ?
    > **Intérêt :** un facteur imbriqué se teste contre la résiduelle : c'est le seul test qui a le bon dénominateur.
 <details>
 <summary>Correction</summary>
@@ -302,7 +357,7 @@ Moyennes : A = 101,3 ; B = 120,7 ; C = 139,3 ; moyenne générale = 120,4.
 $\text{SCE}_{\text{isolant}} = 3 \times [(101{,}3 - 120{,}4)^2 + (120{,}7 - 120{,}4)^2 + (139{,}3 - 120{,}4)^2] = 2\,166{,}2$, ddl 2.
 </details>
 
-2. Lire la p-value de l'isolant ($F = 128{,}3$, ddl $(2 ; 2)$). Pourquoi la table de Fisher de l'exercice 4 du chapitre 14 ne suffit-elle pas ici ?
+2. Lire la p-value de l'isolant (F = 128,3, avec 2 et 2 ddl). Pourquoi la table de Fisher de l'exercice 4 du chapitre 14 ne suffit-elle pas ici ?
    > **Intérêt :** une table a des bornes ; quand la valeur est au-delà, il faut calculer.
 <details>
 <summary>Correction</summary>
