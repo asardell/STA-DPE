@@ -65,7 +65,13 @@ Le tirage par `slice_head()` suit l'ordre du fichier : il est reproductible, san
 
 ## Démarche : modèle, hypothèses et tableau
 
-Le modèle à deux facteurs s'écrit : $y_{ijk} = \mu + \alpha_i + \beta_j + (\alpha\beta)_{ij} + \varepsilon_{ijk}$, où $\alpha_i$ est l'effet de l'énergie $i$, $\beta_j$ l'effet de la période $j$, et $(\alpha\beta)_{ij}$ l'effet d'interaction.
+Le modèle à deux facteurs s'écrit :
+
+$$
+y_{ijk} = \mu + \alpha_i + \beta_j + (\alpha\beta)_{ij} + \varepsilon_{ijk}
+$$
+
+où $\alpha_i$ est l'effet de l'énergie $i$, $\beta_j$ l'effet de la période $j$, et $(\alpha\beta)_{ij}$ l'effet d'interaction.
 
 On pose trois tests :
 
