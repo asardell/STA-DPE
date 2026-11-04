@@ -78,6 +78,7 @@ Deux fonctions servent pour chaque couple : l'une trace le boxplot bivarié (une
 # Boxplot bivarié : une boîte par groupe, losange = moyenne du groupe
 boxplot_bivarie <- function(data, y, x, ylim = NULL) {
   d <- data.frame(valeur = data[[y]], groupe = data[[x]])
+  d <- d[!is.na(d$valeur) & !is.na(d$groupe), ]   # sans NA : sinon la moyenne du groupe devient NA
   p <- ggplot(d, aes(x = groupe, y = valeur, fill = groupe)) +
     geom_boxplot(outlier.shape = NA) +
     stat_summary(fun = mean, geom = "point", shape = 23, size = 3, fill = "white") +
