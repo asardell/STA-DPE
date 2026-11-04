@@ -121,8 +121,8 @@ Le logarithme de la consommation par m² est utilisé comme au chapitre 9 : sa d
 | Nombre de groupes | $k$ | nombre de modalités du facteur |
 | Effectif total | $N$ | nombre total d'observations |
 | Moyenne d'un groupe | $\bar{y}_i$ | moyenne des observations du groupe $i$ |
-| Carré moyen inter-groupes | CM$_{\text{inter}}$ | variabilité entre les moyennes des groupes |
-| Carré moyen intra-groupes | CM$_{\text{intra}}$ | variabilité à l'intérieur des groupes |
+| Carré moyen inter-groupes | $\text{CM}_{\text{inter}}$ | variabilité entre les moyennes des groupes |
+| Carré moyen intra-groupes | $\text{CM}_{\text{intra}}$ | variabilité à l'intérieur des groupes |
 
 ## Démarche en six étapes
 
