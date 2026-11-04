@@ -338,7 +338,7 @@ La catégorie « Fioul et autres » a la part de F-G la plus élevée (54,9 %), 
 
 ## Exercice 5 – Lire une p-value dans la table du Khi²
 
-Quand on n'a pas de logiciel, la p-value se lit dans la table du Khi² : une ligne par degré de liberté, une colonne par valeur de la statistique $\chi^2$. On reproduit cette table, puis on lit une p-value qui n'est pas proche de zéro.
+Quand on n'a pas de logiciel, la p-value se lit dans la table du Khi² : une ligne par degré de liberté, une colonne par probabilité $p$, et dans chaque cellule la valeur de $\chi^2$ qui a cette p-value. On reproduit cette table, puis on lit une p-value qui n'est pas proche de zéro.
 
 La p-value est la probabilité qu'une loi du Khi² à $d$ ddl dépasse la valeur observée :
 
@@ -359,23 +359,21 @@ $$
 ### Exemple
 
 ```r
-stats <- c(1, 2, 4, 6, 8, 10, 15, 20)
-ddls  <- c(1, 2, 4, 6, 8, 12)
+probas <- c(0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.001)
+ddls   <- c(1, 2, 4, 6, 8, 12)
 
-table_chi2 <- outer(ddls, stats, function(df, x) pchisq(x, df = df, lower.tail = FALSE))
-dimnames(table_chi2) <- list(ddl = ddls, X2 = stats)
-round(table_chi2, digits = 4)
-#      X2
-# ddl     1      2      4      6      8     10     15     20
-# 1     0.3173 0.1573 0.0455 0.0143 0.0047 0.0016 0.0001 0.0000
-# 2     0.6065 0.3679 0.1353 0.0498 0.0183 0.0067 0.0006 0.0000
-# 4     0.9098 0.7358 0.4060 0.1991 0.0916 0.0404 0.0047 0.0005
-# 6     0.9856 0.9197 0.6767 0.4232 0.2381 0.1247 0.0203 0.0028
-# 8     0.9982 0.9810 0.8571 0.6472 0.4335 0.2650 0.0591 0.0103
-# 12    1.0000 0.9994 0.9834 0.9161 0.7851 0.6160 0.2414 0.0671
-
-qchisq(0.95, df = c(1, 2, 4, 6, 8, 12))
-# 3.841 5.991 9.488 12.592 15.507 21.026
+# Chaque cellule : la valeur de X2 dont la p-value vaut la probabilité de la colonne
+table_chi2 <- outer(ddls, probas, function(df, p) qchisq(p, df = df, lower.tail = FALSE))
+dimnames(table_chi2) <- list(ddl = ddls, p = probas)
+round(table_chi2, digits = 3)
+#     p
+# ddl    0.5   0.2   0.1  0.05  0.02  0.01 0.001
+# 1    0.455 1.642 2.706 3.841 5.412 6.635 10.828
+# 2    1.386 3.219 4.605 5.991 7.824 9.210 13.816
+# 4    3.357 5.989 7.779 9.488 11.668 13.277 18.467
+# 6    5.348 8.558 10.645 12.592 15.033 16.812 22.458
+# 8    7.344 11.030 13.362 15.507 18.168 20.090 26.124
+# 12  11.340 15.812 18.549 21.026 24.054 26.217 32.909
 ```
 
 ### Exercices
@@ -392,7 +390,7 @@ tab_am <- tab_am[, c("appartement", "maison")]
 chisq.test(tab_am, correct = FALSE)
 # X-squared = 4.93, df = 1, p-value = 0.0263
 ```
-Dans la table pour 1 ddl, $\chi^2 = 4{,}93$ se situe entre 4 (p = 0,0455) et 6 (p = 0,0143). Une interpolation donne environ 0,031. La valeur exacte est 0,026 : elle est significative au seuil de 5 %, donc on rejette $H_0$. L'écart avec l'interpolation montre qu'une lecture de table est approximative, et qu'elle dépasse la valeur réelle ici.
+Dans la table pour 1 ddl, $\chi^2 = 4{,}93$ se situe entre 3,841 (colonne p = 0,05) et 5,412 (colonne p = 0,02). La p-value est donc entre 0,02 et 0,05. Une interpolation entre ces deux colonnes donne environ 0,029. La valeur exacte est 0,026 : elle est significative au seuil de 5 %, donc on rejette $H_0$. L'écart avec l'interpolation montre qu'une lecture de table est approximative, et qu'elle surestime la p-value ici.
 
 > **Note : correction de Yates**
 > Pour un tableau 2 × 2, `chisq.test()` applique par défaut une correction de continuité (Yates). Ici on l'a désactivée avec `correct = FALSE` pour retrouver la formule de la table. La correction réduit la statistique, donc la p-value avec correction serait un peu plus élevée.
@@ -407,7 +405,7 @@ Dans la table pour 1 ddl, $\chi^2 = 4{,}93$ se situe entre 4 (p = 0,0455) et 6 (
 round(pchisq(10, df = 4, lower.tail = FALSE), digits = 4)   # 0.0404
 qchisq(0.95, df = 4)                                         # 9.488
 ```
-La table donne 0,0404 pour $\chi^2 = 10$ et 4 ddl, ce qui est significatif au seuil de 5 %. La valeur critique est 9,488 : toute statistique supérieure est significative.
+Dans la table, la ligne 4 ddl donne 9,488 pour p = 0,05 et 11,668 pour p = 0,02. Donc $\chi^2 = 10$ se situe entre ces deux colonnes : la p-value est entre 0,02 et 0,05, ce qui est cohérent avec la valeur exacte 0,0404. Elle est significative au seuil de 5 %. La valeur critique à 5 % est 9,488 (la cellule p = 0,05) : toute statistique supérieure est significative.
 </details>
 
 ## Liens utiles
