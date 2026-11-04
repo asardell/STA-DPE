@@ -98,13 +98,13 @@ $$
 \text{SCE}_{\text{région}} = 9 \times [(13{,}7 - 15{,}7)^2 + (17{,}7 - 15{,}7)^2] = 72{,}0
 $$
 
-**Entre champs, à l'intérieur d'une région** (4 ddl, soit $2 \times (3 - 1)$) :
+**Entre champs, à l'intérieur d'une région** (4 ddl, soit 2 × (3 − 1)) :
 
 $$
 \text{SCE}_{\text{champ}} = 3 \times \sum (\bar{y}_{\text{champ}} - \bar{y}_{\text{région}})^2 = 64{,}0
 $$
 
-**Résiduelle**, c'est-à-dire les plantes dans un même champ (12 ddl, soit $6 \times 2$) :
+**Résiduelle**, c'est-à-dire les plantes dans un même champ (12 ddl, soit 6 × 2) :
 
 $$
 \text{SCE}_E = 12{,}0
@@ -354,7 +354,11 @@ summary(aov(conso ~ isolant + chantier + equipe, data = carre))
 
 Moyennes : A = 101,3 ; B = 120,7 ; C = 139,3 ; moyenne générale = 120,4.
 
-$\text{SCE}_{\text{isolant}} = 3 \times [(101{,}3 - 120{,}4)^2 + (120{,}7 - 120{,}4)^2 + (139{,}3 - 120{,}4)^2] = 2\,166{,}2$, ddl 2.
+$$
+\text{SCE}_{\text{isolant}} = 3 \times [(101{,}3 - 120{,}4)^2 + (120{,}7 - 120{,}4)^2 + (139{,}3 - 120{,}4)^2] = 2\,166{,}2
+$$
+
+avec 2 ddl.
 </details>
 
 2. Lire la p-value de l'isolant (F = 128,3, avec 2 et 2 ddl). Pourquoi la table de Fisher de l'exercice 4 du chapitre 14 ne suffit-elle pas ici ?
