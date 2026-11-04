@@ -171,7 +171,15 @@ $$
 \text{SCE}_{\text{total}} = \sum_{i}\sum_{j} (y_{ij} - \bar{y})^2
 $$
 
-Deux relations permettent de vérifier le calcul : $\text{SCE}_{\text{total}} = \text{SCE}_{\text{inter}} + \text{SCE}_{\text{intra}}$, et $\eta^2 = \text{SCE}_{\text{inter}} / \text{SCE}_{\text{total}}$.
+Deux relations permettent de vérifier le calcul :
+
+$$
+\text{SCE}_{\text{total}} = \text{SCE}_{\text{inter}} + \text{SCE}_{\text{intra}}
+$$
+
+$$
+\eta^2 = \text{SCE}_{\text{inter}} / \text{SCE}_{\text{total}}
+$$
 
 La démarche se déroule dans cet ordre :
 
@@ -198,7 +206,7 @@ On compare le logarithme de la consommation par m² selon le type d'énergie de 
 | `aov()` | ANOVA à un facteur, format désempilé. | formule `y ~ facteur`, `data` | `aov(ln_conso_m2 ~ energie, data = dpe_an)` |
 | `summary()` | Table de l'ANOVA : ddl, somme des carrés, $F$, p-value. | | `summary(modele)` |
 | `aggregate()` | Moyenne et écart-type par groupe. | formule, `FUN` | `aggregate(ln_conso_m2 ~ energie, data = dpe_an, FUN = mean)` |
-| Part de variance expliquée | Calcul à partir de la table, sans fonction dédiée. | | $\eta^2 = \text{SCE}_{\text{inter}} / \text{SCE}_{\text{total}}$ |
+| Part de variance expliquée | Calcul à partir de la table, sans fonction dédiée. | | $\eta^2$ = SCE inter / SCE total |
 
 ### Exemple
 

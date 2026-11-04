@@ -117,7 +117,11 @@ $$
 \text{SCE}_T = \sum_{i,j,k} (y_{ijk} - \bar{y})^2
 $$
 
-Les sommes des carrés vérifient $\text{SCE}_T = \text{SCE}_A + \text{SCE}_B + \text{SCE}_{AB} + \text{SCE}_E$.
+Les sommes des carrés vérifient :
+
+$$
+\text{SCE}_T = \text{SCE}_A + \text{SCE}_B + \text{SCE}_{AB} + \text{SCE}_E
+$$
 
 > **Note : l'interaction d'abord**
 > Si l'interaction est significative, les effets principaux ne se lisent pas seuls : l'effet de l'énergie dépend de la période. On commence donc toujours par le test d'interaction.
