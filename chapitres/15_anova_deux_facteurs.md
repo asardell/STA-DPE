@@ -77,13 +77,45 @@ Pour chaque test, $\alpha = 0{,}05$ est fixé avant le calcul. Le risque $\beta$
 
 Avec $a$ modalités de A, $b$ de B et $n$ répétitions par cellule, le tableau s'écrit :
 
-| Source | Somme des carrés (SCE) | ddl | Carré moyen (CM) | $F$ | p-value |
-|--------|------------------------|-----|------------------|-----|---------|
-| Facteur A | $\text{SCE}_A = bn \sum_i (\bar{y}_{i\cdot\cdot} - \bar{y}_{\cdot\cdot\cdot})^2$ | $a - 1$ | $\text{SCE}_A / (a-1)$ | $\text{CM}_A / \text{CM}_E$ | $P(F_{a-1,\,ab(n-1)} > F)$ |
-| Facteur B | $\text{SCE}_B = an \sum_j (\bar{y}_{\cdot j\cdot} - \bar{y}_{\cdot\cdot\cdot})^2$ | $b - 1$ | $\text{SCE}_B / (b-1)$ | $\text{CM}_B / \text{CM}_E$ | $P(F_{b-1,\,ab(n-1)} > F)$ |
-| Interaction A × B | $\text{SCE}_{AB} = n \sum_{i,j} (\bar{y}_{ij\cdot} - \bar{y}_{i\cdot\cdot} - \bar{y}_{\cdot j\cdot} + \bar{y}_{\cdot\cdot\cdot})^2$ | $(a-1)(b-1)$ | $\text{SCE}_{AB} / [(a-1)(b-1)]$ | $\text{CM}_{AB} / \text{CM}_E$ | $P(F_{(a-1)(b-1),\,ab(n-1)} > F)$ |
-| Résiduelle | $\text{SCE}_E = \sum_{i,j,k} (y_{ijk} - \bar{y}_{ij\cdot})^2$ | $ab(n-1)$ | $\text{SCE}_E / [ab(n-1)]$ | | |
-| Total | $\text{SCE}_T = \sum_{i,j,k} (y_{ijk} - \bar{y})^2$ | $abn - 1$ | | | |
+| Source | Somme des carrés (SCE) | ddl | Carré moyen (CM) | F | p-value |
+|--------|------------------------|-----|------------------|---|---------|
+| Facteur A | formule (1) ci-dessous | a − 1 | SCE A / (a − 1) | CM A / CM E | loi de Fisher, ddl (a − 1 ; ab(n − 1)) |
+| Facteur B | formule (2) ci-dessous | b − 1 | SCE B / (b − 1) | CM B / CM E | loi de Fisher, ddl (b − 1 ; ab(n − 1)) |
+| Interaction A × B | formule (3) ci-dessous | (a − 1)(b − 1) | SCE AB / [(a − 1)(b − 1)] | CM AB / CM E | loi de Fisher, ddl ((a − 1)(b − 1) ; ab(n − 1)) |
+| Résiduelle | formule (4) ci-dessous | ab(n − 1) | SCE E / [ab(n − 1)] | | |
+| Total | formule (5) ci-dessous | abn − 1 | | | |
+
+Formules des sommes des carrés :
+
+Facteur A (1) :
+
+$$
+\text{SCE}_A = bn \sum_i (\bar{y}_{i\cdot\cdot} - \bar{y}_{\cdot\cdot\cdot})^2
+$$
+
+Facteur B (2) :
+
+$$
+\text{SCE}_B = an \sum_j (\bar{y}_{\cdot j\cdot} - \bar{y}_{\cdot\cdot\cdot})^2
+$$
+
+Interaction A × B (3) :
+
+$$
+\text{SCE}_{AB} = n \sum_{i,j} (\bar{y}_{ij\cdot} - \bar{y}_{i\cdot\cdot} - \bar{y}_{\cdot j\cdot} + \bar{y}_{\cdot\cdot\cdot})^2
+$$
+
+Résiduelle (4) :
+
+$$
+\text{SCE}_E = \sum_{i,j,k} (y_{ijk} - \bar{y}_{ij\cdot})^2
+$$
+
+Total (5) :
+
+$$
+\text{SCE}_T = \sum_{i,j,k} (y_{ijk} - \bar{y})^2
+$$
 
 Les sommes des carrés vérifient $\text{SCE}_T = \text{SCE}_A + \text{SCE}_B + \text{SCE}_{AB} + \text{SCE}_E$.
 

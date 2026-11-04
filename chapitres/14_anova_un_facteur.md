@@ -145,11 +145,31 @@ Sous $H_0$, $F$ suit une loi de Fisher à $(k - 1)$ et $(N - k)$ degrés de libe
 
 Les calculs se résument dans un tableau. Les sommes des carrés se découpent en une part entre groupes et une part à l'intérieur des groupes :
 
-| Source | Somme des carrés (SCE) | ddl | Carré moyen (CM) | $F$ | p-value |
-|--------|------------------------|-----|------------------|-----|---------|
-| Inter-groupes | $\text{SCE}_{\text{inter}} = \sum_{i=1}^{k} n_i (\bar{y}_i - \bar{y})^2$ | $k - 1$ | $\text{CM}_{\text{inter}} = \text{SCE}_{\text{inter}} / (k - 1)$ | $\text{CM}_{\text{inter}} / \text{CM}_{\text{intra}}$ | $P(F_{k-1,\,N-k} > F)$ |
-| Intra-groupes (résiduelle) | $\text{SCE}_{\text{intra}} = \sum_{i=1}^{k} \sum_{j=1}^{n_i} (y_{ij} - \bar{y}_i)^2$ | $N - k$ | $\text{CM}_{\text{intra}} = \text{SCE}_{\text{intra}} / (N - k)$ | | |
-| Total | $\text{SCE}_{\text{total}} = \sum_{i}\sum_{j} (y_{ij} - \bar{y})^2$ | $N - 1$ | | | |
+| Source | Somme des carrés (SCE) | ddl | Carré moyen (CM) | F | p-value |
+|--------|------------------------|-----|------------------|---|---------|
+| Inter-groupes | formule (1) ci-dessous | k − 1 | SCE inter / (k − 1) | CM inter / CM intra | loi de Fisher, ddl (k − 1 ; N − k) |
+| Intra-groupes (résiduelle) | formule (2) ci-dessous | N − k | SCE intra / (N − k) | | |
+| Total | formule (3) ci-dessous | N − 1 | | | |
+
+Formules des sommes des carrés :
+
+Inter-groupes (1) :
+
+$$
+\text{SCE}_{\text{inter}} = \sum_{i=1}^{k} n_i (\bar{y}_i - \bar{y})^2
+$$
+
+Intra-groupes (2) :
+
+$$
+\text{SCE}_{\text{intra}} = \sum_{i=1}^{k} \sum_{j=1}^{n_i} (y_{ij} - \bar{y}_i)^2
+$$
+
+Total (3) :
+
+$$
+\text{SCE}_{\text{total}} = \sum_{i}\sum_{j} (y_{ij} - \bar{y})^2
+$$
 
 Deux relations permettent de vérifier le calcul : $\text{SCE}_{\text{total}} = \text{SCE}_{\text{inter}} + \text{SCE}_{\text{intra}}$, et $\eta^2 = \text{SCE}_{\text{inter}} / \text{SCE}_{\text{total}}$.
 
