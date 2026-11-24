@@ -45,12 +45,13 @@ Voici les objectifs de ce chapitre :
     - [Exemple](#exemple-5)
     - [Exercices](#exercices-5)
   - [Aller plus loin avec la régression polynomiale et curvilinéaire](#aller-plus-loin-avec-la-régression-polynomiale-et-curvilinéaire)
-      - [1. La régression polynomiale de degré 2](#1-la-régression-polynomiale-de-degré-2)
-      - [2. Utiliser `lm()` pour une régression polynomiale](#2-utiliser-lm-pour-une-régression-polynomiale)
-      - [3. Comparer une droite et une courbe](#3-comparer-une-droite-et-une-courbe)
-      - [4. Tracer la courbe polynomiale avec ggplot2](#4-tracer-la-courbe-polynomiale-avec-ggplot2)
-      - [6. Exercices](#6-exercices)
-      - [Différence entre polynomiale et curvilinéaire](#différence-entre-polynomiale-et-curvilinéaire)
+    - [1. La régression polynomiale de degré 2](#1-la-régression-polynomiale-de-degré-2)
+    - [2. Utiliser `lm()` pour une régression polynomiale](#2-utiliser-lm-pour-une-régression-polynomiale)
+    - [3. Comparer une droite et une courbe](#3-comparer-une-droite-et-une-courbe)
+    - [4. Tracer la courbe polynomiale avec ggplot2](#4-tracer-la-courbe-polynomiale-avec-ggplot2)
+    - [5. Exercices](#5-exercices)
+    - [À retenir](#à-retenir)
+    - [Différence entre polynomiale et curvilinéaire](#différence-entre-polynomiale-et-curvilinéaire)
   - [Liens utiles](#liens-utiles)
 
 ## Préparation : packages, données et notations
@@ -616,46 +617,41 @@ Aucun logement de 1 000 m² n'est dans les données, sauf quelques très grands 
 
 ## Aller plus loin avec la régression polynomiale et curvilinéaire
 
-La régression linéaire simple suppose que la relation entre deux
-variables peut être représentée par une droite :
+La régression linéaire simple suppose que la relation entre deux variables peut être représentée par une droite :
 
-\[ y = `\beta`{=tex}\_0 + `\beta`{=tex}\_1 x + `\varepsilon`{=tex} \]
+$$
+y = \beta_0 + \beta_1 x + \varepsilon
+$$
 
-Cependant, certaines relations ne sont pas linéaires. Par exemple, la
-consommation énergétique peut augmenter avec la surface, mais cette
-augmentation peut être plus ou moins rapide selon la taille du logement.
+Cependant, certaines relations ne sont pas linéaires. Par exemple, la consommation énergétique peut augmenter avec la surface, mais cette augmentation peut être plus ou moins rapide selon la taille du logement.
 
-Dans ce cas, une droite ne représente pas nécessairement correctement la
-relation. On peut utiliser une **régression polynomiale**, qui permet
-d'ajuster une courbe.
+Dans ce cas, une droite ne représente pas nécessairement correctement la relation. On peut utiliser une **régression polynomiale**, qui permet d'ajuster une courbe.
 
-#### 1. La régression polynomiale de degré 2
+### 1. La régression polynomiale de degré 2
 
 Une régression polynomiale de degré 2 ajoute un terme au carré :
 
-\[ y = `\beta`{=tex}\_0 + `\beta`{=tex}\_1 x + `\beta`{=tex}\_2 x\^2 +
-`\varepsilon`{=tex} \]
+$$
+y = \beta_0 + \beta_1 x + \beta_2 x^2 + \varepsilon
+$$
 
 Cette équation correspond à une parabole.
 
--   (`\beta`{=tex}\_0) : ordonnée à l'origine ;
--   (`\beta`{=tex}\_1) : coefficient du terme linéaire ;
--   (`\beta`{=tex}\_2) : coefficient du terme quadratique.
+- $\beta_0$ : ordonnée à l'origine ;
+- $\beta_1$ : coefficient du terme linéaire ;
+- $\beta_2$ : coefficient du terme quadratique.
 
-Le signe de (`\beta`{=tex}\_2) détermine la forme de la courbe :
+Le signe de $\beta_2$ détermine la forme de la courbe :
 
--   Si (`\beta`{=tex}\_2 \> 0), la courbe est convexe (forme de U).
--   Si (`\beta`{=tex}\_2 \< 0), la courbe est concave (forme de U
-    inversé).
--   Si (`\beta`{=tex}\_2 = 0), le modèle revient à une régression
-    linéaire.
+- Si $\beta_2 > 0$, la courbe est convexe (forme de U).
+- Si $\beta_2 < 0$, la courbe est concave (forme de U inversé).
+- Si $\beta_2 = 0$, le modèle revient à une régression linéaire.
 
-#### 2. Utiliser `lm()` pour une régression polynomiale
+### 2. Utiliser `lm()` pour une régression polynomiale
 
-La fonction `lm()` permet d'ajouter des puissances de variables
-directement dans la formule.
+La fonction `lm()` permet d'ajouter des puissances de variables directement dans la formule.
 
-``` r
+```r
 # Régression linéaire classique
 modele_lineaire <- lm(
   conso_5_usages_ep ~ surface_habitable_logement,
@@ -673,13 +669,11 @@ modele_poly2 <- lm(
 summary(modele_poly2)
 ```
 
-**Attention :** `I()` indique à R qu'il faut effectuer une opération
-mathématique classique. Sans `I()`, le symbole `^` a une signification
-particulière dans les formules de R.
+**Attention :** `I()` indique à R qu'il faut effectuer une opération mathématique classique. Sans `I()`, le symbole `^` a une signification particulière dans les formules de R.
 
 Pour une régression de degré 3, on peut ajouter un terme au cube :
 
-``` r
+```r
 modele_poly3 <- lm(
   conso_5_usages_ep ~ surface_habitable_logement +
     I(surface_habitable_logement^2) +
@@ -690,38 +684,32 @@ modele_poly3 <- lm(
 summary(modele_poly3)
 ```
 
-#### 3. Comparer une droite et une courbe
+### 3. Comparer une droite et une courbe
 
-Pour savoir si le modèle polynomial améliore l'ajustement, on peut
-comparer les coefficients de détermination (R\^2).
+Pour savoir si le modèle polynomial améliore l'ajustement, on peut comparer les coefficients de détermination ($R^2$).
 
-``` r
+```r
 summary(modele_lineaire)$r.squared
 summary(modele_poly2)$r.squared
 summary(modele_poly3)$r.squared
 ```
 
-On peut également réaliser un test de comparaison entre deux modèles
-emboîtés :
+On peut également réaliser un test de comparaison entre deux modèles emboîtés :
 
-``` r
+```r
 anova(modele_lineaire, modele_poly2)
 anova(modele_poly2, modele_poly3)
 ```
 
-Si la p-value est inférieure à 0,05, le modèle le plus complexe améliore
-significativement l'ajustement par rapport au modèle plus simple.
+Si la p-value est inférieure à 0,05, le modèle le plus complexe améliore significativement l'ajustement par rapport au modèle plus simple.
 
-**Attention :** ajouter des termes polynomiaux augmente généralement le
-(R\^2), même si l'amélioration est peu utile. Il faut aussi regarder le
-(R\^2) ajusté et la forme des résidus.
+**Attention :** ajouter des termes polynomiaux augmente généralement le $R^2$, même si l'amélioration est peu utile. Il faut aussi regarder le $R^2$ ajusté et la forme des résidus.
 
-#### 4. Tracer la courbe polynomiale avec ggplot2
+### 4. Tracer la courbe polynomiale avec ggplot2
 
-La fonction `geom_smooth()` permet de visualiser la différence entre une
-droite et une courbe.
+La fonction `geom_smooth()` permet de visualiser la différence entre une droite et une courbe.
 
-``` r
+```r
 ggplot(dpe, aes(
   x = surface_habitable_logement,
   y = conso_5_usages_ep
@@ -739,117 +727,100 @@ ggplot(dpe, aes(
   )
 ```
 
--   La courbe bleue représente la régression linéaire.
--   La courbe rouge représente la régression polynomiale de degré 2.
+- La courbe bleue représente la régression linéaire.
+- La courbe rouge représente la régression polynomiale de degré 2.
 
-Si la courbe rouge suit mieux la forme générale du nuage de points, cela
-peut indiquer que la relation est curvilinéaire.
+Si la courbe rouge suit mieux la forme générale du nuage de points, cela peut indiquer que la relation est curvilinéaire.
 
-#### 6. Exercices
+### 5. Exercices
 
-1.  Ajuster une régression polynomiale de degré 2 entre la surface et la
-    consommation totale. Comparer son (R\^2) avec celui de la régression
-    linéaire.
+**Exercice 1.** Ajuster une régression polynomiale de degré 2 entre la surface et la consommation totale. Comparer son $R^2$ avec celui de la régression linéaire.
 
-    *Intérêt :* vérifier si une courbe représente mieux la relation
-    entre la surface et la consommation.
+*Intérêt :* vérifier si une courbe représente mieux la relation entre la surface et la consommation.
 
-    **Correction :**
+**Correction :**
 
-    ``` r
-    modele_poly2 <- lm(
-      conso_5_usages_ep ~ surface_habitable_logement +
-        I(surface_habitable_logement^2),
-      data = dpe
-    )
+```r
+modele_poly2 <- lm(
+  conso_5_usages_ep ~ surface_habitable_logement +
+    I(surface_habitable_logement^2),
+  data = dpe
+)
 
-    summary(modele_poly2)$r.squared
-    summary(modele_lineaire)$r.squared
-    ```
+summary(modele_poly2)$r.squared
+summary(modele_lineaire)$r.squared
+```
 
-2.  Réaliser un test avec `anova()` pour déterminer si le modèle
-    polynomial améliore significativement le modèle linéaire.
+**Exercice 2.** Réaliser un test avec `anova()` pour déterminer si le modèle polynomial améliore significativement le modèle linéaire.
 
-    *Intérêt :* ne pas choisir un modèle uniquement parce que son (R\^2)
-    est plus élevé.
+*Intérêt :* ne pas choisir un modèle uniquement parce que son $R^2$ est plus élevé.
 
-    **Correction :**
+**Correction :**
 
-    ``` r
-    anova(modele_lineaire, modele_poly2)
-    ```
+```r
+anova(modele_lineaire, modele_poly2)
+```
 
-    Si la p-value est inférieure à 0,05, on rejette l'hypothèse selon
-    laquelle le terme quadratique n'apporte aucune amélioration.
+Si la p-value est inférieure à 0,05, on rejette l'hypothèse selon laquelle le terme quadratique n'apporte aucune amélioration.
 
-3.  Tracer les deux modèles sur le même graphique. Lequel semble le
-    mieux représenter le nuage de points ?
+**Exercice 3.** Tracer les deux modèles sur le même graphique. Lequel semble le mieux représenter le nuage de points ?
 
-    *Intérêt :* compléter les résultats statistiques par une analyse
-    graphique.
+*Intérêt :* compléter les résultats statistiques par une analyse graphique.
 
-    **Correction :**
+**Correction :**
 
-    ``` r
-    ggplot(dpe, aes(
-      x = surface_habitable_logement,
-      y = conso_5_usages_ep
-    )) +
-      geom_point(alpha = 0.2) +
-      geom_smooth(method = "lm", formula = y ~ x,
-                  se = FALSE, colour = "blue") +
-      geom_smooth(method = "lm", formula = y ~ poly(x, 2),
-                  se = FALSE, colour = "red") +
-      coord_cartesian(xlim = c(0, 200), ylim = c(0, 50000))
-    ```
+```r
+ggplot(dpe, aes(
+  x = surface_habitable_logement,
+  y = conso_5_usages_ep
+)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(method = "lm", formula = y ~ x,
+              se = FALSE, colour = "blue") +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 2),
+              se = FALSE, colour = "red") +
+  coord_cartesian(xlim = c(0, 200), ylim = c(0, 50000))
+```
 
-4.  Ajuster une régression polynomiale de degré 3. Comparer son (R\^2)
-    ajusté avec celui du modèle de degré 2. Est-il nécessaire de
-    conserver le modèle le plus complexe ?
+**Exercice 4.** Ajuster une régression polynomiale de degré 3. Comparer son $R^2$ ajusté avec celui du modèle de degré 2. Est-il nécessaire de conserver le modèle le plus complexe ?
 
-    *Intérêt :* comprendre qu'un modèle plus complexe n'est pas
-    forcément un meilleur modèle.
+*Intérêt :* comprendre qu'un modèle plus complexe n'est pas forcément un meilleur modèle.
 
-    **Correction :**
+**Correction :**
 
-    ``` r
-    modele_poly3 <- lm(
-      conso_5_usages_ep ~ surface_habitable_logement +
-        I(surface_habitable_logement^2) +
-        I(surface_habitable_logement^3),
-      data = dpe
-    )
+```r
+modele_poly3 <- lm(
+  conso_5_usages_ep ~ surface_habitable_logement +
+    I(surface_habitable_logement^2) +
+    I(surface_habitable_logement^3),
+  data = dpe
+)
 
-    summary(modele_poly2)$adj.r.squared
-    summary(modele_poly3)$adj.r.squared
+summary(modele_poly2)$adj.r.squared
+summary(modele_poly3)$adj.r.squared
 
-    anova(modele_poly2, modele_poly3)
-    ```
+anova(modele_poly2, modele_poly3)
+```
 
-    On conserve le modèle de degré 3 uniquement si sa complexité
-    supplémentaire apporte une amélioration pertinente. Le (R\^2) ajusté
-    et le test `anova()` aident à prendre cette décision.
+On conserve le modèle de degré 3 uniquement si sa complexité supplémentaire apporte une amélioration pertinente. Le $R^2$ ajusté et le test `anova()` aident à prendre cette décision.
 
-**À retenir :**
+### À retenir
 
--   `lm(y ~ x)` ajuste une droite.
--   `lm(y ~ x + I(x^2))` ajuste une parabole.
--   `lm(y ~ x + I(x^2) + I(x^3))` ajuste un polynôme de degré 3.
--   `anova()` compare deux modèles emboîtés.
--   Le (R\^2) ajusté permet de tenir compte du nombre de paramètres.
--   Une courbe plus complexe n'est pas nécessairement plus pertinente.
--   Comme pour la régression linéaire, il faut éviter l'extrapolation en
-    dehors de la plage des données observées.
+- `lm(y ~ x)` ajuste une droite.
+- `lm(y ~ x + I(x^2))` ajuste une parabole.
+- `lm(y ~ x + I(x^2) + I(x^3))` ajuste un polynôme de degré 3.
+- `anova()` compare deux modèles emboîtés.
+- Le $R^2$ ajusté permet de tenir compte du nombre de paramètres.
+- Une courbe plus complexe n'est pas nécessairement plus pertinente.
+- Comme pour la régression linéaire, il faut éviter l'extrapolation en dehors de la plage des données observées.
 
-#### Différence entre polynomiale et curvilinéaire
+### Différence entre polynomiale et curvilinéaire
 
--   **Régression polynomiale** : méthode précise qui utilise des
-    puissances de (x) (carré, cube, etc.).
--   **Régression curvilinéaire** : terme plus général qui désigne une
-    relation représentée par une courbe plutôt que par une droite.
+- **Régression polynomiale** : méthode précise qui utilise des puissances de $x$ (carré, cube, etc.).
+- **Régression curvilinéaire** : terme plus général qui désigne une relation représentée par une courbe plutôt que par une droite.
 
-Une relation curvilinéaire peut donc être modélisée par un polynôme,
-mais aussi par d'autres fonctions (exponentielle, logarithmique, etc.).
+Une relation curvilinéaire peut donc être modélisée par un polynôme, mais aussi par d'autres fonctions (exponentielle, logarithmique, etc.).
+
 
 
 ## Liens utiles
