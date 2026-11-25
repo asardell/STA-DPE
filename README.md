@@ -1,6 +1,6 @@
 # STA-DPE
 
-Ce référentiel regroupe les supports de la formation de trois jours « Statistiques avec R ». Le fil rouge est l'analyse des DPE (diagnostics de performance énergétique) de Villeurbanne, récupérés via l'API de l'ADEME.
+Ce référentiel regroupe les supports de la formation de trois jours « Statistiques avec R ». Le fil rouge est l'analyse des DPE (diagnostics de performance énergétique) de Villeurbanne, récupérés via l'API de l'ADEME ! 
 
 Les données sont filtrées sur le code postal de Villeurbanne (`code_postal_ban`). Le fichier utilisé est `data/dpe_villeurbanne_10000.csv` (10 000 DPE).
 
